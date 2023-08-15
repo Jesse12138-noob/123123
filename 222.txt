@@ -1,0 +1,33 @@
+class MNA:
+    def __init__(self, node_count, voltage_source_count=0):
+        self.node_count = node_count
+        self.voltage_source_count = voltage_source_count
+        self.G = np.zeros((node_count + voltage_source_count, node_count + voltage_source_count))  # Conductance matrix
+        self.I = np.zeros((node_count + voltage_source_count, 1))  # Current vector
+
+    def add_resistor(self, node1, node2, value):
+        if node1 != 0:
+            self.G[node1-1, node1-1] += 1.0 / value
+        if node2 != 0:
+            self.G[node2-1, node2-1] += 1.0 / value
+        if node1 != 0 and node2 != 0:
+            self.G[node1-1, node2-1] -= 1.0 / value
+            self.G[node2-1, node1-1] -= 1.0 / value
+
+    def add_current_source(self, node1, node2, value):
+        if node1 != 0:
+            self.I[node1-1] -= value
+        if node2 != 0:
+            self.I[node2-1] += value
+
+    def add_voltage_source(self, node1, node2, value, vs_index):
+        if node1 != 0:
+            self.G[self.node_count + vs_index - 1, node1 - 1] = 1
+            self.G[node1 - 1, self.node_count + vs_index - 1] = 1
+        if node2 != 0:
+            self.G[self.node_count + vs_index - 1, node2 - 1] = -1
+            self.G[node2 - 1, self.node_count + vs_index - 1] = -1
+        self.I[self.node_count + vs_index - 1] = value
+
+    def solve(self):
+        return np.linalg.solve(self.G, self.I)

@@ -1,0 +1,11 @@
+SERIES CIRCUIT (title)
+* a comment line
+VS 1 0 5
+R1 1 2 1K
+R2 2 3 2K
+R3 3 0 3K
+.DC VS 6 6 1
+.PRINT DC V(2,3) V(2) I(R2) V(1) V(3)
+.END
+
+很好，现在我们成功解析了用户要执行的分析的命令，我们现在就要开始分析了，我希望你能按照刚刚的解析形式，实现一个perform_dc_analysis函数，我可以给你我已经实现的，你可能用得上的代码：

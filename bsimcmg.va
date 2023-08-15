@@ -1,0 +1,4931 @@
+/**
+ * @file bsimcmg.va
+ * @author spiceman
+ * @brief bsimcmg verilog-a code (for reference c code reference)
+ * 
+ * @version 0.1
+ * @date 2023-06-27
+ *
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
+module bsimcmg(d, g, s, e, t);
+
+///////////////////// terminal definition start /////////////////////
+  inout d, g, s, e, t;
+  electrical d, g, s, e, t;
+  electrical si, di, ge, N;
+  thermal t;
+///////////////////// terminal definition end ///////////////////////
+
+///////////////////// parameter definition start ////////////////////
+  parameter real L = 3.0e-8;
+  parameter real D = 4.0e-8;
+  parameter real TFIN = 1.5e-8;
+  parameter real FPITCH = 8.0e-8;
+  parameter integer NF = 1;
+  parameter real NFIN = 1.0;
+  parameter integer NGCON = 1;
+  parameter real ASEO = 0.0;
+  parameter real ADEO = 0.0;
+  parameter real PSEO = 0.0;
+  parameter real PDEO = 0.0;
+  parameter real ASEJ = 0.0;
+  parameter real ADEJ = 0.0;
+  parameter real PSEJ = 0.0;
+  parameter real PDEJ = 0.0;
+  parameter real COVS = 0.0;
+  parameter real COVD = COVS;
+  parameter real CGSP = 0.0;
+  parameter real CGDP = 0.0;
+  parameter real CDSP = 0.0;
+  parameter real NRS = 0.0;
+  parameter real NRD = 0.0;
+  parameter real LRSD = L;
+  parameter real NFINNOM = 1.0;
+
+  parameter real XL = 0.0;
+  parameter real DTEMP = 0.0;
+  parameter real DELVTRAND = 0.0;
+  parameter real U0MULT = 1.0;
+  parameter real IDS0MULT = 1.0;
+  parameter integer DEVTYPE = 1;
+  parameter integer TYPE = DEVTYPE;
+  parameter integer BULKMOD = 0;
+  parameter integer GEOMOD = 0;
+  parameter integer CGEO1SW = 0;
+  parameter integer RDSMOD = 0;
+  parameter integer ASYMMOD = 0;
+  parameter integer IGCMOD = 0;
+  parameter integer IGBMOD = 0;
+  parameter integer GIDLMOD = 0;
+  parameter integer IIMOD = 0;
+  parameter integer TNOIMOD = 0;
+  parameter integer NQSMOD = 0;
+  parameter integer SHMOD = 0;
+  parameter integer TEMPMOD = 0;
+  parameter integer RGATEMOD = 0;
+  parameter integer RGEOMOD = 0;
+  parameter integer CGEOMOD = 0;
+  parameter integer SH_WARN = 0;
+  parameter integer IGCLAMP = 1;
+  parameter real LINT = 0.0;
+  parameter real LL = 0.0;
+  parameter real LLN = 1.0;
+  parameter real DLC = 0.0;
+  parameter real DLCACC = 0.0;
+  parameter real DLBIN = 0.0;
+  parameter real LLC = 0.0;
+  parameter real EOT = 1.0e-9;
+  parameter real TOXP = 1.2e-9;
+  parameter real EOTBOX = 1.4e-7;
+  parameter real HFIN = 3.0e-8;
+  parameter real FECH = 1.0;
+  parameter real DELTAW = 0.0;
+  parameter real FECHCV = 1.0;
+  parameter real DELTAWCV = 0.0;
+  parameter real NBODY = 1.0e22;
+  parameter real NBODYN1 = 0.0;
+  parameter real NBODYN2 = 1.0e5;
+  parameter real NSD = 2.0e26;
+  parameter real PHIG = 4.61;
+  parameter real PHIGL = 0.0;
+  parameter real PHIGLT = 0.0;
+  parameter real PHIGN1 = 0.0;
+  parameter real PHIGN2 = 1.0e5;
+  parameter real EPSROX = 3.9;
+  parameter real EPSRSUB = 11.9;
+  parameter real EASUB = 4.05;
+  parameter real NI0SUB = 1.1e16;
+  parameter real BG0SUB = 1.12;
+  parameter real NC0SUB = 2.86e25;
+  parameter real NGATE = 0.0;
+  parameter real Imin = 1.0e-15;
+  parameter real CIT = 0.0;
+  parameter real CITR = CIT;
+  parameter real CDSC = 7.0e-3;
+  parameter real CDSCN1 = 0.0;
+  parameter real CDSCN2 = 1.0e5;
+  parameter real CDSCD = 7.0e-3;
+  parameter real CDSCDN1 = 0.0;
+  parameter real CDSCDN2 = 1.0e5;
+  parameter real CDSCDR = CDSCD;
+  parameter real CDSCDRN1 = CDSCDN1;
+  parameter real CDSCDRN2 = CDSCDN2;
+  parameter real DVT0 = 0.0;
+  parameter real DVT1 = 0.6;
+  parameter real DVT1SS = DVT1;
+  parameter real PHIN = 0.05;
+  parameter real ETA0 = 0.6;
+  parameter real ETA0N1 = 0.0;
+  parameter real ETA0N2 = 1.0e5;
+  parameter real ETA0LT = 0.0;
+  parameter real TETA0 = 0.0;
+  parameter real ETA0R = ETA0;
+  parameter real TETA0R = TETA0;
+  parameter real DSUB = 1.06;
+  parameter real DVTP0 = 0.0;
+  parameter real DVTP1 = 0.0;
+  parameter real ADVTP0 = 0.0;
+  parameter real BDVTP0 = 1.0e-7;
+  parameter real ADVTP1 = 0.0;
+  parameter real BDVTP1 = 1.0e-7;
+  parameter real DVTP2 = 0.0;
+  parameter real K1RSCE = 0.0;
+  parameter real LPE0 = 5.0e-9;
+  parameter real DVTSHIFT = 0.0;
+  parameter real DVTSHIFTR = DVTSHIFT;
+  parameter real THETASCE = 0.0;
+  parameter real THETADIBL = 0.0;
+  parameter real THETASW = 0.0;
+  parameter real NVTM = 0.0;
+  parameter real K0 = 0.0;
+  parameter real K01 = 0.0;
+  parameter real K0SI = 1.0;
+  parameter real K0SI1 = 0.0;
+  parameter real K2SI = K0SI;
+  parameter real K2SI1 = K0SI1;
+  parameter real K0SISAT = 0.0;
+  parameter real K0SISAT1 = 0.0;
+  parameter real K2SISAT = K0SISAT;
+  parameter real K2SISAT1 = K0SISAT1;
+  parameter real PHIBE = 0.7;
+  parameter real K1 = 1.0e-6;
+  parameter real K11 = 0.0;
+  parameter real K2SAT = 0.0;
+  parameter real K2SAT1 = 0.0;
+  parameter real K2 = 0.0;
+  parameter real K21 = 0.0;
+  parameter real QMFACTOR = 0.0;
+  parameter real QMTCENCV = 0.0;
+  parameter real QMTCENCVA = 0.0;
+  parameter real AQMTCEN = 0.0;
+  parameter real BQMTCEN = 1.2e-8;
+  parameter real ETAQM = 0.54;
+  parameter real QM0 = 1.0e-3;
+  parameter real PQM = 0.66;
+  parameter real QM0ACC = 1.0e-3;
+  parameter real PQMACC = 0.66;
+  parameter real VSAT = 8.5e4;
+  parameter real VSATR = VSAT;
+  parameter real VSATN1 = 0.0;
+  parameter real VSATN2 = 1.0e5;
+  parameter real VSATRN1 = VSATN1;
+  parameter real VSATRN2 = VSATN2;
+  parameter real AVSAT = 0.0;
+  parameter real BVSAT = 1.0e-7;
+  parameter real VSAT1 = VSAT;
+  parameter real VSAT1N1 = VSATN1;
+  parameter real VSAT1N2 = VSATN2;
+  parameter real VSAT1R = VSAT1;
+  parameter real VSAT1RN1 = VSAT1N1;
+  parameter real VSAT1RN2 = VSAT1N2;
+  parameter real AVSAT1 = AVSAT;
+  parameter real BVSAT1 = BVSAT;
+  parameter real DELTAVSAT = 1.0;
+  parameter real PSAT = 2.0;
+  parameter real APSAT = 0.0;
+  parameter real BPSAT = 1.0;
+  parameter real KSATIV = 1.0;
+  parameter real KSATIVR = KSATIV;
+  parameter real VSATCV = VSAT;
+  parameter real AVSATCV = AVSAT;
+  parameter real BVSATCV = BVSAT;
+  parameter real DELTAVSATCV = DELTAVSAT;
+  parameter real PSATCV = PSAT;
+  parameter real APSATCV = APSAT;
+  parameter real BPSATCV = BPSAT;
+  parameter real MEXP = 4.0;
+  parameter real AMEXP = 0.0;
+  parameter real BMEXP = 1.0;
+  parameter real MEXPR = MEXP;
+  parameter real AMEXPR = AMEXP;
+  parameter real BMEXPR = BMEXP;
+  parameter real PTWG = 0.0;
+  parameter real PTWGR = PTWG;
+  parameter real APTWG = 0.0;
+  parameter real BPTWG = 1.0e-7;
+  parameter real AT = -1.56e-3;
+  parameter real ATR = AT;
+  parameter real ATCV = AT;
+  parameter real TMEXP = 0.0;
+  parameter real TMEXPR = TMEXP;
+  parameter real PTWGT = 4.0e-3;
+  parameter real U0 = 3.0e-2;
+  parameter real U0R = U0;
+  parameter real U0N1 = 0.0;
+  parameter real U0N1R = U0N1;
+  parameter real U0N2 = 1.0e5;
+  parameter real U0N2R = U0N2;
+  parameter real U0LT = 0.0;
+  parameter real ETAMOB = 2.0;
+  parameter real UP = 0.0;
+  parameter real LPA = 1.0;
+  parameter real UPR = UP;
+  parameter real LPAR = LPA;
+  parameter real UA = 0.3;
+  parameter real UAR = UA;
+  parameter real AUA = 0.0;
+  parameter real AUAR = AUA;
+  parameter real BUA = 1.0e-7;
+  parameter real BUAR = BUA;
+  parameter real UC = 0.0;
+  parameter real UCR = UC;
+  parameter real EU = 2.5;
+  parameter real EUR = EU;
+  parameter real AEU = 0.0;
+  parameter real AEUR = AEU;
+  parameter real BEU = 1.0e-7;
+  parameter real BEUR = BEU;
+  parameter real UD = 0.0;
+  parameter real UDR = UD;
+  parameter real AUD = 0.0;
+  parameter real AUDR = AUD;
+  parameter real BUD = 5.0e-8;
+  parameter real BUDR = BUD;
+  parameter real UCS = 1.0;
+  parameter real UTE = 0.0;
+  parameter real UTER = UTE;
+  parameter real UTL = -1.5e-3;
+  parameter real UTLR = UTL;
+  parameter real EMOBT = 0.0;
+  parameter real UA1 = 1.032e-3;
+  parameter real UA1R = UA1;
+  parameter real UC1 = 5.6e-11;
+  parameter real UC1R = UC1;
+  parameter real UD1 = 0.0;
+  parameter real UD1R = UD1;
+  parameter real UCSTE = -4.775e-3;
+  parameter real CHARGEWF = 0.0;
+  parameter real RDSWMIN = 0.0;
+  parameter real RDSW = 1.0e2;
+  parameter real ARDSW = 0.0;
+  parameter real BRDSW = 1.0e-7;
+  parameter real RSWMIN = 0.0;
+  parameter real RSW = 5.0e1;
+  parameter real ARSW = 0.0;
+  parameter real BRSW = 1.0e-7;
+  parameter real RDWMIN = 0.0;
+  parameter real RDW = 5.0e1;
+  parameter real ARDW = 0.0;
+  parameter real BRDW = 1.0e-7;
+  parameter real RSDR = 0.0;
+  parameter real RSDRR = RSDR;
+  parameter real RDDR = RSDR;
+  parameter real RDDRR = RDDR;
+  parameter real PRSDR = 1.0;
+  parameter real PRDDR = PRSDR;
+  parameter real PRWGS = 0.0;
+  parameter real PRWGD = PRWGS;
+  parameter real WR = 1.0;
+  parameter real PRT = 1.0e-3;
+  parameter real TRSDR = 0.0;
+  parameter real TRDDR = TRSDR;
+  parameter real PDIBL1 = 1.3;
+  parameter real PDIBL1R = PDIBL1;
+  parameter real PDIBL2 = 2.0e-4;
+  parameter real PDIBL2R = PDIBL2;
+  parameter real DROUT = 1.06;
+  parameter real PVAG = 1.0;
+  parameter real PCLM = 1.3e-2;
+  parameter real PCLMR = PCLM;
+  parameter real APCLM = 0.0;
+  parameter real APCLMR = APCLM;
+  parameter real BPCLM = 1.0e-7;
+  parameter real BPCLMR = BPCLM;
+  parameter real PCLMG = 0.0;
+  parameter real PCLMCV = PCLM;
+  parameter real A1 = 0.0;
+  parameter real A11 = 0.0;
+  parameter real A2 = 0.0;
+  parameter real A21 = 0.0;
+  parameter real RGEXT = 0.0;
+  parameter real RGFIN = 1.0e-3;
+  parameter real RSHS = 0.0;
+  parameter real RSHD = RSHS;
+  parameter real HEPI = 1.0e-8;
+  parameter real TSILI = 1.0e-8;
+  parameter real RHOC = 1.0e-12;
+  parameter real RHORSD = 1.0;
+  parameter real CRATIO = 0.5;
+  parameter real DELTAPRSD = 0.0;
+  parameter integer SDTERM = 0;
+  parameter real LSP = (0.2 * (L + XL));
+  parameter real EPSRSP = 3.9;
+  parameter real TGATE = 3.0e-8;
+  parameter real TMASK = 3.0e-8;
+  parameter real ASILIEND = 0.0;
+  parameter real ARSDEND = 0.0;
+  parameter real PRSDEND = 0.0;
+  parameter real NSDE = 2.0e25;
+  parameter real RGEOA = 1.0;
+  parameter real RGEOB = 0.0;
+  parameter real RGEOC = 0.0;
+  parameter real RGEOD = 0.0;
+  parameter real RGEOE = 0.0;
+  parameter real CGEOA = 1.0;
+  parameter real CGEOB = 0.0;
+  parameter real CGEOC = 0.0;
+  parameter real CGEOD = 0.0;
+  parameter real CGEOE = 1.0;
+  parameter real AIGBINV = 1.11e-2;
+  parameter real AIGBINV1 = 0.0;
+  parameter real BIGBINV = 9.49e-4;
+  parameter real CIGBINV = 6.0e-3;
+  parameter real EIGBINV = 1.1;
+  parameter real NIGBINV = 3.0;
+  parameter real AIGBACC = 1.36e-2;
+  parameter real AIGBACC1 = 0.0;
+  parameter real BIGBACC = 1.71e-3;
+  parameter real CIGBACC = 7.5e-2;
+  parameter real NIGBACC = 1.0;
+  parameter real AIGC = 1.36e-2;
+  parameter real AIGC1 = 0.0;
+  parameter real BIGC = 1.71e-3;
+  parameter real CIGC = 7.5e-2;
+  parameter real PIGCD = 1.0;
+  parameter real DLCIGS = 0.0;
+  parameter real AIGS = 1.36e-2;
+  parameter real AIGS1 = 0.0;
+  parameter real BIGS = 1.71e-3;
+  parameter real CIGS = 7.5e-2;
+  parameter real DLCIGD = DLCIGS;
+  parameter real AIGD = AIGS;
+  parameter real AIGD1 = AIGS1;
+  parameter real BIGD = BIGS;
+  parameter real CIGD = CIGS;
+  parameter real VFBSD = 0.0;
+  parameter real VFBSDCV = VFBSD;
+  parameter real TOXREF = 1.2e-9;
+  parameter real TOXG = TOXP;
+  parameter real NTOX = 1.0;
+  parameter real POXEDGE = 1.0;
+  parameter real AGISL = 6.055e-12;
+  parameter real BGISL = 3.0e8;
+  parameter real CGISL = 0.5;
+  parameter real EGISL = 0.2;
+  parameter real PGISL = 1.0;
+  parameter real AGIDL = AGISL;
+  parameter real BGIDL = BGISL;
+  parameter real CGIDL = CGISL;
+  parameter real EGIDL = EGISL;
+  parameter real PGIDL = PGISL;
+  parameter real ALPHA0 = 0.0;
+  parameter real ALPHA01 = 0.0;
+  parameter real ALPHA1 = 0.0;
+  parameter real ALPHA11 = 0.0;
+  parameter real BETA0 = 0.0;
+  parameter real ALPHAII0 = 0.0;
+  parameter real ALPHAII01 = 0.0;
+  parameter real ALPHAII1 = 0.0;
+  parameter real ALPHAII11 = 0.0;
+  parameter real BETAII0 = 0.0;
+  parameter real BETAII1 = 0.0;
+  parameter real BETAII2 = 0.1;
+  parameter real ESATII = 1.0e7;
+  parameter real LII = 0.5e-9;
+  parameter real SII0 = 0.5;
+  parameter real SII1 = 0.1;
+  parameter real SII2 = 0.0;
+  parameter real SIID = 0.0;
+  parameter real IIMOD2CLAMP1 = 0.1;
+  parameter real IIMOD2CLAMP2 = 0.1;
+  parameter real IIMOD2CLAMP3 = 0.1;
+  parameter real EOTACC = EOT;
+  parameter real DELVFBACC = 0.0;
+  parameter real CFS = 2.5e-11;
+  parameter real CFD = CFS;
+  parameter real CGSO = 0.0;
+  parameter real CGDO = CGSO;
+  parameter real CGSL = 0.0;
+  parameter real CGDL = CGSL;
+  parameter real CKAPPAS = 0.6;
+  parameter real CKAPPAD = CKAPPAS;
+  parameter real CGBO = 0.0;
+  parameter real CGBN = 0.0;
+  parameter real CGBL = 0.0;
+  parameter real CKAPPAB = 0.6;
+  parameter real CSDESW = 0.0;
+  parameter real CJS = 5.0e-4;
+  parameter real CJD = CJS;
+  parameter real CJSWS = 5.0e-10;
+  parameter real CJSWD = CJSWS;
+  parameter real CJSWGS = 0.0;
+  parameter real CJSWGD = CJSWGS;
+  parameter real PBS = 1.0;
+  parameter real PBD = PBS;
+  parameter real PBSWS = 1.0;
+  parameter real PBSWD = PBSWS;
+  parameter real PBSWGS = PBSWS;
+  parameter real PBSWGD = PBSWGS;
+  parameter real MJS = 0.5;
+  parameter real MJD = MJS;
+  parameter real MJSWS = 0.33;
+  parameter real MJSWD = MJSWS;
+  parameter real MJSWGS = MJSWS;
+  parameter real MJSWGD = MJSWGS;
+  parameter real SJS = 0.0;
+  parameter real SJD = SJS;
+  parameter real SJSWS = 0.0;
+  parameter real SJSWD = SJSWS;
+  parameter real SJSWGS = 0.0;
+  parameter real SJSWGD = SJSWGS;
+  parameter real MJS2 = 1.25e-1;
+  parameter real MJD2 = MJS2;
+  parameter real MJSWS2 = 8.3e-2;
+  parameter real MJSWD2 = MJSWS2;
+  parameter real MJSWGS2 = MJSWS2;
+  parameter real MJSWGD2 = MJSWGS2;
+  parameter real JSS = 1.0e-4;
+  parameter real JSD = JSS;
+  parameter real JSWS = 0.0;
+  parameter real JSWD = JSWS;
+  parameter real JSWGS = 0.0;
+  parameter real JSWGD = JSWGS;
+  parameter real NJS = 1.0;
+  parameter real NJD = NJS;
+  parameter real IJTHSFWD = 0.1;
+  parameter real IJTHDFWD = IJTHSFWD;
+  parameter real IJTHSREV = 0.1;
+  parameter real IJTHDREV = IJTHSREV;
+  parameter real BVS = 1.0e1;
+  parameter real BVD = BVS;
+  parameter real XJBVS = 1.0;
+  parameter real XJBVD = XJBVS;
+  parameter real JTSS = 0.0;
+  parameter real JTSD = JTSS;
+  parameter real JTSSWS = 0.0;
+  parameter real JTSSWD = JTSSWS;
+  parameter real JTSSWGS = 0.0;
+  parameter real JTSSWGD = JTSSWGS;
+  parameter real JTWEFF = 0.0;
+  parameter real NJTS = 2.0e1;
+  parameter real NJTSD = NJTS;
+  parameter real NJTSSW = 2.0e1;
+  parameter real NJTSSWD = NJTSSW;
+  parameter real NJTSSWG = 2.0e1;
+  parameter real NJTSSWGD = NJTSSWG;
+  parameter real VTSS = 1.0e1;
+  parameter real VTSD = VTSS;
+  parameter real VTSSWS = 1.0e1;
+  parameter real VTSSWD = VTSSWS;
+  parameter real VTSSWGS = 1.0e1;
+  parameter real VTSSWGD = VTSSWGS;
+  parameter real LINTIGEN = 0.0;
+  parameter real NTGEN = 1.0;
+  parameter real AIGEN = 0.0;
+  parameter real BIGEN = 0.0;
+  parameter real XRCRG1 = 1.2e1;
+  parameter real XRCRG2 = 1.0;
+  parameter integer NSEG = 4;
+  parameter real EF = 1.0;
+  parameter real EM = 4.1e7;
+  parameter real NOIA = 6.25e39;
+  parameter real NOIB = 3.125e24;
+  parameter real NOIC = 8.75e7;
+  parameter real LINTNOI = 0.0;
+  parameter real NTNOI = 1.0;
+  parameter real TNOIA = 1.5;
+  parameter real TNOIB = 3.5;
+  parameter real RNOIA = 5.77e-1;
+  parameter real RNOIB = 3.7e-1;
+  parameter real TNOIC = 3.5;
+  parameter real RNOIC = 3.95e-1;
+  parameter real SCALEN = 1.0e5;
+  parameter real TNOM = 27.0;
+  parameter real TBGASUB = 7.02e-4;
+  parameter real TBGBSUB = 1.108e3;
+  parameter real KT1 = 0.0;
+  parameter real KT1L = 0.0;
+  parameter real TSS = 0.0;
+  parameter real IIT = -0.5;
+  parameter real TII = 0.0;
+  parameter real TGIDL = -3.0e-3;
+  parameter real IGT = 2.5;
+  parameter real TCJ = 0.0;
+  parameter real TCJSW = 0.0;
+  parameter real TCJSWG = 0.0;
+  parameter real TPB = 0.0;
+  parameter real TPBSW = 0.0;
+  parameter real TPBSWG = 0.0;
+  parameter real XTIS = 3.0;
+  parameter real XTID = XTIS;
+  parameter real XTSS = 2.0e-2;
+  parameter real XTSD = XTSS;
+  parameter real XTSSWS = 2.0e-2;
+  parameter real XTSSWD = XTSSWS;
+  parameter real XTSSWGS = 2.0e-2;
+  parameter real XTSSWGD = XTSSWGS;
+  parameter real TNJTS = 0.0;
+  parameter real TNJTSD = TNJTS;
+  parameter real TNJTSSW = 0.0;
+  parameter real TNJTSSWD = TNJTSSW;
+  parameter real TNJTSSWG = 0.0;
+  parameter real TNJTSSWGD = TNJTSSWG;
+  parameter real RTH0 = 1.0e-2;
+  parameter real CTH0 = 1.0e-5;
+  parameter real WTH0 = 0.0;
+  parameter real ASHEXP = 1.0;
+  parameter real BSHEXP = 1.0;
+  parameter real ACH_UFCM = 1.0;
+  parameter real CINS_UFCM = 1.0;
+  parameter real W_UFCM = 1.0;
+  parameter real TFIN_TOP = 1.5e-8;
+  parameter real TFIN_BASE = 1.5e-8;
+  parameter real QMFACTORCV = 0.0;
+  parameter real ALPHA_UFCM = 0.5556;
+  parameter real LNBODY = 0.0;
+  parameter real NNBODY = 0.0;
+  parameter real PNBODY = 0.0;
+  parameter real LPHIG = 0.0;
+  parameter real NPHIG = 0.0;
+  parameter real PPHIG = 0.0;
+  parameter real LNGATE = 0.0;
+  parameter real NNGATE = 0.0;
+  parameter real PNGATE = 0.0;
+  parameter real LCIT = 0.0;
+  parameter real NCIT = 0.0;
+  parameter real PCIT = 0.0;
+  parameter real LCITR = LCIT;
+  parameter real NCITR = NCIT;
+  parameter real PCITR = PCIT;
+  parameter real LCDSC = 0.0;
+  parameter real NCDSC = 0.0;
+  parameter real PCDSC = 0.0;
+  parameter real LCDSCD = 0.0;
+  parameter real NCDSCD = 0.0;
+  parameter real PCDSCD = 0.0;
+  parameter real LCDSCDR = LCDSCD;
+  parameter real NCDSCDR = NCDSCD;
+  parameter real PCDSCDR = PCDSCD;
+  parameter real LDVT0 = 0.0;
+  parameter real NDVT0 = 0.0;
+  parameter real PDVT0 = 0.0;
+  parameter real LDVT1 = 0.0;
+  parameter real NDVT1 = 0.0;
+  parameter real PDVT1 = 0.0;
+  parameter real LDVT1SS = LDVT1;
+  parameter real NDVT1SS = NDVT1;
+  parameter real PDVT1SS = PDVT1;
+  parameter real LPHIN = 0.0;
+  parameter real NPHIN = 0.0;
+  parameter real PPHIN = 0.0;
+  parameter real LETA0 = 0.0;
+  parameter real NETA0 = 0.0;
+  parameter real PETA0 = 0.0;
+  parameter real LETA0R = LETA0;
+  parameter real NETA0R = NETA0;
+  parameter real PETA0R = PETA0;
+  parameter real LDSUB = 0.0;
+  parameter real NDSUB = 0.0;
+  parameter real PDSUB = 0.0;
+  parameter real LK1RSCE = 0.0;
+  parameter real NK1RSCE = 0.0;
+  parameter real PK1RSCE = 0.0;
+  parameter real LLPE0 = 0.0;
+  parameter real NLPE0 = 0.0;
+  parameter real PLPE0 = 0.0;
+  parameter real LDVTSHIFT = 0.0;
+  parameter real NDVTSHIFT = 0.0;
+  parameter real PDVTSHIFT = 0.0;
+  parameter real LDVTSHIFTR = LDVTSHIFT;
+  parameter real NDVTSHIFTR = NDVTSHIFT;
+  parameter real PDVTSHIFTR = PDVTSHIFT;
+  parameter real LPHIBE = 0.0;
+  parameter real NPHIBE = 0.0;
+  parameter real PPHIBE = 0.0;
+  parameter real LK0 = 0.0;
+  parameter real NK0 = 0.0;
+  parameter real PK0 = 0.0;
+  parameter real LK01 = 0.0;
+  parameter real NK01 = 0.0;
+  parameter real PK01 = 0.0;
+  parameter real LK0SI = 0.0;
+  parameter real NK0SI = 0.0;
+  parameter real PK0SI = 0.0;
+  parameter real LK0SI1 = 0.0;
+  parameter real NK0SI1 = 0.0;
+  parameter real PK0SI1 = 0.0;
+  parameter real LK1 = 0.0;
+  parameter real NK1 = 0.0;
+  parameter real PK1 = 0.0;
+  parameter real LK11 = 0.0;
+  parameter real NK11 = 0.0;
+  parameter real PK11 = 0.0;
+  parameter real LK2SI = LK0SI;
+  parameter real NK2SI = NK0SI;
+  parameter real PK2SI = PK0SI;
+  parameter real LK2SI1 = LK0SI1;
+  parameter real NK2SI1 = NK0SI1;
+  parameter real PK2SI1 = PK0SI1;
+  parameter real LK0SISAT = 0.0;
+  parameter real NK0SISAT = 0.0;
+  parameter real PK0SISAT = 0.0;
+  parameter real LK0SISAT1 = 0.0;
+  parameter real NK0SISAT1 = 0.0;
+  parameter real PK0SISAT1 = 0.0;
+  parameter real LK2SISAT = LK0SISAT;
+  parameter real NK2SISAT = NK0SISAT;
+  parameter real PK2SISAT = PK0SISAT;
+  parameter real LK2SISAT1 = LK0SISAT1;
+  parameter real NK2SISAT1 = NK0SISAT1;
+  parameter real PK2SISAT1 = PK0SISAT1;
+  parameter real LK2SAT = 0.0;
+  parameter real NK2SAT = 0.0;
+  parameter real PK2SAT = 0.0;
+  parameter real LK2SAT1 = 0.0;
+  parameter real NK2SAT1 = 0.0;
+  parameter real PK2SAT1 = 0.0;
+  parameter real LK2 = 0.0;
+  parameter real NK2 = 0.0;
+  parameter real PK2 = 0.0;
+  parameter real LK21 = 0.0;
+  parameter real NK21 = 0.0;
+  parameter real PK21 = 0.0;
+  parameter real LDVTB = 0.0;
+  parameter real NDVTB = 0.0;
+  parameter real PDVTB = 0.0;
+  parameter real LLPEB = 0.0;
+  parameter real NLPEB = 0.0;
+  parameter real PLPEB = 0.0;
+  parameter real LQMFACTOR = 0.0;
+  parameter real NQMFACTOR = 0.0;
+  parameter real PQMFACTOR = 0.0;
+  parameter real LQMTCENCV = 0.0;
+  parameter real NQMTCENCV = 0.0;
+  parameter real PQMTCENCV = 0.0;
+  parameter real LQMTCENCVA = 0.0;
+  parameter real NQMTCENCVA = 0.0;
+  parameter real PQMTCENCVA = 0.0;
+  parameter real LVSAT = 0.0;
+  parameter real NVSAT = 0.0;
+  parameter real PVSAT = 0.0;
+  parameter real LVSATR = LVSAT;
+  parameter real NVSATR = NVSAT;
+  parameter real PVSATR = PVSAT;
+  parameter real LVSAT1 = LVSAT;
+  parameter real NVSAT1 = NVSAT;
+  parameter real PVSAT1 = PVSAT;
+  parameter real LVSAT1R = LVSAT1;
+  parameter real NVSAT1R = NVSAT1;
+  parameter real PVSAT1R = PVSAT1;
+  parameter real LPSAT = 0.0;
+  parameter real NPSAT = 0.0;
+  parameter real PPSAT = 0.0;
+  parameter real LDELTAVSAT = 0.0;
+  parameter real NDELTAVSAT = 0.0;
+  parameter real PDELTAVSAT = 0.0;
+  parameter real LKSATIV = 0.0;
+  parameter real NKSATIV = 0.0;
+  parameter real PKSATIV = 0.0;
+  parameter real LKSATIVR = LKSATIV;
+  parameter real NKSATIVR = NKSATIV;
+  parameter real PKSATIVR = PKSATIV;
+  parameter real LVSATCV = 0.0;
+  parameter real NVSATCV = 0.0;
+  parameter real PVSATCV = 0.0;
+  parameter real LPSATCV = 0.0;
+  parameter real NPSATCV = 0.0;
+  parameter real PPSATCV = 0.0;
+  parameter real LDELTAVSATCV = 0.0;
+  parameter real NDELTAVSATCV = 0.0;
+  parameter real PDELTAVSATCV = 0.0;
+  parameter real LMEXP = 0.0;
+  parameter real NMEXP = 0.0;
+  parameter real PMEXP = 0.0;
+  parameter real LMEXPR = LMEXP;
+  parameter real NMEXPR = NMEXP;
+  parameter real PMEXPR = PMEXP;
+  parameter real LPTWG = 0.0;
+  parameter real NPTWG = 0.0;
+  parameter real PPTWG = 0.0;
+  parameter real LPTWGR = LPTWG;
+  parameter real NPTWGR = NPTWG;
+  parameter real PPTWGR = PPTWG;
+  parameter real LU0 = 0.0;
+  parameter real NU0 = 0.0;
+  parameter real PU0 = 0.0;
+  parameter real LU0R = LU0;
+  parameter real NU0R = NU0;
+  parameter real PU0R = PU0;
+  parameter real LETAMOB = 0.0;
+  parameter real NETAMOB = 0.0;
+  parameter real PETAMOB = 0.0;
+  parameter real LUP = 0.0;
+  parameter real NUP = 0.0;
+  parameter real PUP = 0.0;
+  parameter real LUPR = LUP;
+  parameter real NUPR = NUP;
+  parameter real PUPR = PUP;
+  parameter real LUA = 0.0;
+  parameter real NUA = 0.0;
+  parameter real PUA = 0.0;
+  parameter real LUAR = LUA;
+  parameter real NUAR = NUA;
+  parameter real PUAR = PUA;
+  parameter real LUC = 0.0;
+  parameter real NUC = 0.0;
+  parameter real PUC = 0.0;
+  parameter real LUCR = LUC;
+  parameter real NUCR = NUC;
+  parameter real PUCR = PUC;
+  parameter real LEU = 0.0;
+  parameter real NEU = 0.0;
+  parameter real PEU = 0.0;
+  parameter real LEUR = LEU;
+  parameter real NEUR = NEU;
+  parameter real PEUR = PEU;
+  parameter real LUD = 0.0;
+  parameter real NUD = 0.0;
+  parameter real PUD = 0.0;
+  parameter real LUDR = LUD;
+  parameter real NUDR = NUD;
+  parameter real PUDR = PUD;
+  parameter real LUCS = 0.0;
+  parameter real NUCS = 0.0;
+  parameter real PUCS = 0.0;
+  parameter real LPCLM = 0.0;
+  parameter real NPCLM = 0.0;
+  parameter real PPCLM = 0.0;
+  parameter real LPCLMR = LPCLM;
+  parameter real NPCLMR = NPCLM;
+  parameter real PPCLMR = PPCLM;
+  parameter real LPCLMG = 0.0;
+  parameter real NPCLMG = 0.0;
+  parameter real PPCLMG = 0.0;
+  parameter real LPCLMCV = LPCLM;
+  parameter real NPCLMCV = NPCLM;
+  parameter real PPCLMCV = PPCLM;
+  parameter real LA1 = 0.0;
+  parameter real NA1 = 0.0;
+  parameter real PA1 = 0.0;
+  parameter real LA11 = 0.0;
+  parameter real NA11 = 0.0;
+  parameter real PA11 = 0.0;
+  parameter real LA2 = 0.0;
+  parameter real NA2 = 0.0;
+  parameter real PA2 = 0.0;
+  parameter real LA21 = 0.0;
+  parameter real NA21 = 0.0;
+  parameter real PA21 = 0.0;
+  parameter real LRDSW = 0.0;
+  parameter real NRDSW = 0.0;
+  parameter real PRDSW = 0.0;
+  parameter real LRSW = 0.0;
+  parameter real NRSW = 0.0;
+  parameter real PRSW = 0.0;
+  parameter real LRDW = 0.0;
+  parameter real NRDW = 0.0;
+  parameter real PRDW = 0.0;
+  parameter real LPRWGS = 0.0;
+  parameter real NPRWGS = 0.0;
+  parameter real PPRWGS = 0.0;
+  parameter real LPRWGD = 0.0;
+  parameter real NPRWGD = 0.0;
+  parameter real PPRWGD = 0.0;
+  parameter real LWR = 0.0;
+  parameter real NWR = 0.0;
+  parameter real PWR = 0.0;
+  parameter real LPDIBL1 = 0.0;
+  parameter real NPDIBL1 = 0.0;
+  parameter real PPDIBL1 = 0.0;
+  parameter real LPDIBL1R = LPDIBL1;
+  parameter real NPDIBL1R = NPDIBL1;
+  parameter real PPDIBL1R = PPDIBL1;
+  parameter real LPDIBL2 = 0.0;
+  parameter real NPDIBL2 = 0.0;
+  parameter real PPDIBL2 = 0.0;
+  parameter real LPDIBL2R = LPDIBL2;
+  parameter real NPDIBL2R = NPDIBL2;
+  parameter real PPDIBL2R = PPDIBL2;
+  parameter real LDROUT = 0.0;
+  parameter real NDROUT = 0.0;
+  parameter real PDROUT = 0.0;
+  parameter real LPVAG = 0.0;
+  parameter real NPVAG = 0.0;
+  parameter real PPVAG = 0.0;
+  parameter real LAIGBINV = 0.0;
+  parameter real NAIGBINV = 0.0;
+  parameter real PAIGBINV = 0.0;
+  parameter real LAIGBINV1 = 0.0;
+  parameter real NAIGBINV1 = 0.0;
+  parameter real PAIGBINV1 = 0.0;
+  parameter real LBIGBINV = 0.0;
+  parameter real NBIGBINV = 0.0;
+  parameter real PBIGBINV = 0.0;
+  parameter real LCIGBINV = 0.0;
+  parameter real NCIGBINV = 0.0;
+  parameter real PCIGBINV = 0.0;
+  parameter real LEIGBINV = 0.0;
+  parameter real NEIGBINV = 0.0;
+  parameter real PEIGBINV = 0.0;
+  parameter real LNIGBINV = 0.0;
+  parameter real NNIGBINV = 0.0;
+  parameter real PNIGBINV = 0.0;
+  parameter real LAIGBACC = 0.0;
+  parameter real NAIGBACC = 0.0;
+  parameter real PAIGBACC = 0.0;
+  parameter real LAIGBACC1 = 0.0;
+  parameter real NAIGBACC1 = 0.0;
+  parameter real PAIGBACC1 = 0.0;
+  parameter real LBIGBACC = 0.0;
+  parameter real NBIGBACC = 0.0;
+  parameter real PBIGBACC = 0.0;
+  parameter real LCIGBACC = 0.0;
+  parameter real NCIGBACC = 0.0;
+  parameter real PCIGBACC = 0.0;
+  parameter real LNIGBACC = 0.0;
+  parameter real NNIGBACC = 0.0;
+  parameter real PNIGBACC = 0.0;
+  parameter real LAIGC = 0.0;
+  parameter real NAIGC = 0.0;
+  parameter real PAIGC = 0.0;
+  parameter real LAIGC1 = 0.0;
+  parameter real NAIGC1 = 0.0;
+  parameter real PAIGC1 = 0.0;
+  parameter real LBIGC = 0.0;
+  parameter real NBIGC = 0.0;
+  parameter real PBIGC = 0.0;
+  parameter real LCIGC = 0.0;
+  parameter real NCIGC = 0.0;
+  parameter real PCIGC = 0.0;
+  parameter real LPIGCD = 0.0;
+  parameter real NPIGCD = 0.0;
+  parameter real PPIGCD = 0.0;
+  parameter real LAIGS = 0.0;
+  parameter real NAIGS = 0.0;
+  parameter real PAIGS = 0.0;
+  parameter real LAIGS1 = 0.0;
+  parameter real NAIGS1 = 0.0;
+  parameter real PAIGS1 = 0.0;
+  parameter real LBIGS = 0.0;
+  parameter real NBIGS = 0.0;
+  parameter real PBIGS = 0.0;
+  parameter real LCIGS = 0.0;
+  parameter real NCIGS = 0.0;
+  parameter real PCIGS = 0.0;
+  parameter real LAIGD = LAIGS;
+  parameter real NAIGD = NAIGS;
+  parameter real PAIGD = PAIGS;
+  parameter real LAIGD1 = LAIGS1;
+  parameter real NAIGD1 = NAIGS1;
+  parameter real PAIGD1 = PAIGS1;
+  parameter real LBIGD = LBIGS;
+  parameter real NBIGD = NBIGS;
+  parameter real PBIGD = PBIGS;
+  parameter real LCIGD = LCIGS;
+  parameter real NCIGD = NCIGS;
+  parameter real PCIGD = PCIGS;
+  parameter real LNTOX = 0.0;
+  parameter real NNTOX = 0.0;
+  parameter real PNTOX = 0.0;
+  parameter real LPOXEDGE = 0.0;
+  parameter real NPOXEDGE = 0.0;
+  parameter real PPOXEDGE = 0.0;
+  parameter real LAGISL = 0.0;
+  parameter real NAGISL = 0.0;
+  parameter real PAGISL = 0.0;
+  parameter real LBGISL = 0.0;
+  parameter real NBGISL = 0.0;
+  parameter real PBGISL = 0.0;
+  parameter real LCGISL = 0.0;
+  parameter real NCGISL = 0.0;
+  parameter real PCGISL = 0.0;
+  parameter real LEGISL = 0.0;
+  parameter real NEGISL = 0.0;
+  parameter real PEGISL = 0.0;
+  parameter real LPGISL = 0.0;
+  parameter real NPGISL = 0.0;
+  parameter real PPGISL = 0.0;
+  parameter real LAGIDL = LAGISL;
+  parameter real NAGIDL = NAGISL;
+  parameter real PAGIDL = PAGISL;
+  parameter real LBGIDL = LBGISL;
+  parameter real NBGIDL = NBGISL;
+  parameter real PBGIDL = PBGISL;
+  parameter real LCGIDL = LCGISL;
+  parameter real NCGIDL = NCGISL;
+  parameter real PCGIDL = PCGISL;
+  parameter real LEGIDL = LEGISL;
+  parameter real NEGIDL = NEGISL;
+  parameter real PEGIDL = PEGISL;
+  parameter real LPGIDL = LPGISL;
+  parameter real NPGIDL = NPGISL;
+  parameter real PPGIDL = PPGISL;
+  parameter real LALPHA0 = 0.0;
+  parameter real NALPHA0 = 0.0;
+  parameter real PALPHA0 = 0.0;
+  parameter real LALPHA1 = 0.0;
+  parameter real NALPHA1 = 0.0;
+  parameter real PALPHA1 = 0.0;
+  parameter real LALPHAII0 = 0.0;
+  parameter real NALPHAII0 = 0.0;
+  parameter real PALPHAII0 = 0.0;
+  parameter real LALPHAII1 = 0.0;
+  parameter real NALPHAII1 = 0.0;
+  parameter real PALPHAII1 = 0.0;
+  parameter real LBETA0 = 0.0;
+  parameter real NBETA0 = 0.0;
+  parameter real PBETA0 = 0.0;
+  parameter real LBETAII0 = 0.0;
+  parameter real NBETAII0 = 0.0;
+  parameter real PBETAII0 = 0.0;
+  parameter real LBETAII1 = 0.0;
+  parameter real NBETAII1 = 0.0;
+  parameter real PBETAII1 = 0.0;
+  parameter real LBETAII2 = 0.0;
+  parameter real NBETAII2 = 0.0;
+  parameter real PBETAII2 = 0.0;
+  parameter real LESATII = 0.0;
+  parameter real NESATII = 0.0;
+  parameter real PESATII = 0.0;
+  parameter real LLII = 0.0;
+  parameter real NLII = 0.0;
+  parameter real PLII = 0.0;
+  parameter real LSII0 = 0.0;
+  parameter real NSII0 = 0.0;
+  parameter real PSII0 = 0.0;
+  parameter real LSII1 = 0.0;
+  parameter real NSII1 = 0.0;
+  parameter real PSII1 = 0.0;
+  parameter real LSII2 = 0.0;
+  parameter real NSII2 = 0.0;
+  parameter real PSII2 = 0.0;
+  parameter real LSIID = 0.0;
+  parameter real NSIID = 0.0;
+  parameter real PSIID = 0.0;
+  parameter real LCFS = 0.0;
+  parameter real NCFS = 0.0;
+  parameter real PCFS = 0.0;
+  parameter real LCFD = LCFS;
+  parameter real NCFD = NCFS;
+  parameter real PCFD = PCFS;
+  parameter real LCOVS = 0.0;
+  parameter real NCOVS = 0.0;
+  parameter real PCOVS = 0.0;
+  parameter real LCOVD = LCOVS;
+  parameter real NCOVD = NCOVS;
+  parameter real PCOVD = PCOVS;
+  parameter real LCGSL = 0.0;
+  parameter real NCGSL = 0.0;
+  parameter real PCGSL = 0.0;
+  parameter real LCGDL = LCGSL;
+  parameter real NCGDL = NCGSL;
+  parameter real PCGDL = PCGSL;
+  parameter real LCKAPPAS = 0.0;
+  parameter real NCKAPPAS = 0.0;
+  parameter real PCKAPPAS = 0.0;
+  parameter real LCKAPPAD = LCKAPPAS;
+  parameter real NCKAPPAD = NCKAPPAS;
+  parameter real PCKAPPAD = PCKAPPAS;
+  parameter real LCGBL = 0.0;
+  parameter real NCGBL = 0.0;
+  parameter real PCGBL = 0.0;
+  parameter real LCKAPPAB = 0.0;
+  parameter real NCKAPPAB = 0.0;
+  parameter real PCKAPPAB = 0.0;
+  parameter real LNTGEN = 0.0;
+  parameter real NNTGEN = 0.0;
+  parameter real PNTGEN = 0.0;
+  parameter real LAIGEN = 0.0;
+  parameter real NAIGEN = 0.0;
+  parameter real PAIGEN = 0.0;
+  parameter real LBIGEN = 0.0;
+  parameter real NBIGEN = 0.0;
+  parameter real PBIGEN = 0.0;
+  parameter real LXRCRG1 = 0.0;
+  parameter real NXRCRG1 = 0.0;
+  parameter real PXRCRG1 = 0.0;
+  parameter real LXRCRG2 = 0.0;
+  parameter real NXRCRG2 = 0.0;
+  parameter real PXRCRG2 = 0.0;
+  parameter real LUTE = 0.0;
+  parameter real NUTE = 0.0;
+  parameter real PUTE = 0.0;
+  parameter real LUTER = LUTE;
+  parameter real NUTER = NUTE;
+  parameter real PUTER = PUTE;
+  parameter real LUTL = 0.0;
+  parameter real NUTL = 0.0;
+  parameter real PUTL = 0.0;
+  parameter real LUTLR = LUTL;
+  parameter real NUTLR = NUTL;
+  parameter real PUTLR = PUTL;
+  parameter real LEMOBT = 0.0;
+  parameter real NEMOBT = 0.0;
+  parameter real PEMOBT = 0.0;
+  parameter real LUA1 = 0.0;
+  parameter real NUA1 = 0.0;
+  parameter real PUA1 = 0.0;
+  parameter real LUA1R = LUA1;
+  parameter real NUA1R = NUA1;
+  parameter real PUA1R = PUA1;
+  parameter real LUC1 = 0.0;
+  parameter real NUC1 = 0.0;
+  parameter real PUC1 = 0.0;
+  parameter real LUC1R = LUC1;
+  parameter real NUC1R = NUC1;
+  parameter real PUC1R = PUC1;
+  parameter real LUD1 = 0.0;
+  parameter real NUD1 = 0.0;
+  parameter real PUD1 = 0.0;
+  parameter real LUD1R = LUD1;
+  parameter real NUD1R = NUD1;
+  parameter real PUD1R = PUD1;
+  parameter real LUCSTE = 0.0;
+  parameter real NUCSTE = 0.0;
+  parameter real PUCSTE = 0.0;
+  parameter real LPTWGT = 0.0;
+  parameter real NPTWGT = 0.0;
+  parameter real PPTWGT = 0.0;
+  parameter real LAT = 0.0;
+  parameter real NAT = 0.0;
+  parameter real PAT = 0.0;
+  parameter real LATR = LAT;
+  parameter real NATR = NAT;
+  parameter real PATR = PAT;
+  parameter real LATCV = 0.0;
+  parameter real NATCV = 0.0;
+  parameter real PATCV = 0.0;
+  parameter real LSTTHETASAT = 0.0;
+  parameter real NSTTHETASAT = 0.0;
+  parameter real PSTTHETASAT = 0.0;
+  parameter real LPRT = 0.0;
+  parameter real NPRT = 0.0;
+  parameter real PPRT = 0.0;
+  parameter real LKT1 = 0.0;
+  parameter real NKT1 = 0.0;
+  parameter real PKT1 = 0.0;
+  parameter real LTSS = 0.0;
+  parameter real NTSS = 0.0;
+  parameter real PTSS = 0.0;
+  parameter real LIIT = 0.0;
+  parameter real NIIT = 0.0;
+  parameter real PIIT = 0.0;
+  parameter real LTII = 0.0;
+  parameter real NTII = 0.0;
+  parameter real PTII = 0.0;
+  parameter real LTGIDL = 0.0;
+  parameter real NTGIDL = 0.0;
+  parameter real PTGIDL = 0.0;
+  parameter real LIGT = 0.0;
+  parameter real NIGT = 0.0;
+  parameter real PIGT = 0.0;
+///////////////////// parameter definition end //////////////////////
+
+///////////////////// variable definition start /////////////////////
+  real WEFF;
+  real LEFF;
+  real WEFFCV;
+  real LEFFCV;
+  real IDS;
+  real IDEFF;
+  real ISEFF;
+  real IGTOT;
+  real IDSGEN;
+  real III;
+  real IGS;
+  real IGD;
+  real IGCS;
+  real IGCD;
+  real IGBS;
+  real IGBD;
+  real IGIDL;
+  real IGISL;
+  real IJSB;
+  real IJDB;
+  real ISUB;
+  real BETA;
+  real VTH;
+  real VDSSAT;
+  real VFB;
+  real GM;
+  real GDS;
+  real GMBS;
+  real QGI;
+  real QDI;
+  real QSI;
+  real QBI;
+  real QG;
+  real QD;
+  real QS;
+  real QB;
+  real CGGI;
+  real CGSI;
+  real CGDI;
+  real CGEI;
+  real CDGI;
+  real CDDI;
+  real CDSI;
+  real CDEI;
+  real CSGI;
+  real CSDI;
+  real CSSI;
+  real CSEI;
+  real CEGI;
+  real CEDI;
+  real CESI;
+  real CEEI;
+  real CGG;
+  real CGS;
+  real CGD;
+  real CGE;
+  real CDG;
+  real CDD;
+  real CDS;
+  real CDE;
+  real CSG;
+  real CSD;
+  real CSS;
+  real CSE;
+  real CEG;
+  real CED;
+  real CES;
+  real CEE;
+  real CGSEXT;
+  real CGDEXT;
+  real CGBOV;
+  real CJST;
+  real CJDT;
+  real RSGEO;
+  real RDGEO;
+  real CFGEO;
+  real T_TOTAL_K;
+  real T_TOTAL_C;
+  real T_DELTA_SH;
+  integer devsign;
+  real NFINtotal;
+  real DevTemp;
+  real ids0;
+  real ids0_ov_dqi;
+  real ids;
+  real vgs;
+  real vds;
+  real vdsx;
+  real sigvds;
+  real vch;
+  real etaiv;
+  real vgs_noswap;
+  real vds_noswap;
+  real vgd_noswap;
+  real qd;
+  real qg;
+  real qs;
+  real qb;
+  real ni;
+  real epssub;
+  real epssp;
+  real epsratio;
+  real Eg;
+  real Eg0;
+  real Nc;
+  real Lg;
+  real deltaL;
+  real deltaL1;
+  real deltaLCV;
+  real Leff;
+  real Leff1;
+  real LeffCV;
+  real LeffCV_acc;
+  real Weff0;
+  real WeffCV0;
+  real cox;
+  real cdsc;
+  real cbox;
+  real nbody;
+  real phib;
+  real deltaPhi;
+  real T0;
+  real T1;
+  real T2;
+  real T3;
+  real T4;
+  real T4a;
+  real T5;
+  real T6;
+  real T7;
+  real T8;
+  real T9;
+  real Vtm;
+  real Vtm0;
+  real nVtm;
+  real beta;
+  real beta0;
+  real wf;
+  real wr;
+  real Tnom;
+  real TRatio;
+  real dvth_temp;
+  real delTemp;
+  real ThetaSS;
+  real K0_t;
+  real K0SI_t;
+  real K2SI_t;
+  real K1_t;
+  real K2SAT_t;
+  real A1_t;
+  real A2_t;
+  real AIGBINV_t;
+  real AIGBACC_t;
+  real AIGC_t;
+  real AIGS_t;
+  real AIGD_t;
+  real BETA0_t;
+  real SII0_t;
+  real BGISL_t;
+  real BGIDL_t;
+  real igtemp;
+  real PTWG_t;
+  real PTWGR_t;
+  real ALPHA0_t;
+  real ALPHA1_t;
+  real ALPHAII0_t;
+  real ALPHAII1_t;
+  real CJS_t;
+  real CJSWS_t;
+  real CJSWGD_t;
+  real CJD_t;
+  real CJSWD_t;
+  real CJSWGS_t;
+  real PBS_t;
+  real PBSWS_t;
+  real PBSWGS_t;
+  real PBD_t;
+  real PBSWD_t;
+  real PBSWGD_t;
+  real JSS_t;
+  real JSWS_t;
+  real JSWGS_t;
+  real JSD_t;
+  real JSWD_t;
+  real JSWGD_t;
+  real JTSS_t;
+  real JTSD_t;
+  real JTSSWS_t;
+  real JTSSWD_t;
+  real JTSSWGS_t;
+  real JTSSWGD_t;
+  real NJTS_t;
+  real NJTSD_t;
+  real NJTSSW_t;
+  real NJTSSWD_t;
+  real NJTSSWG_t;
+  real NJTSSWGD_t;
+  real K2_t;
+  real K0SISAT_t;
+  real K2SISAT_t;
+  real q0;
+  real T10;
+  real T11;
+  real T12;
+  real e0;
+  real e1;
+  real e2;
+  real vgsfb;
+  real vgsfbeff;
+  real ETA0_t;
+  real ETA0R_t;
+  real scl;
+  real vbi;
+  real phist;
+  real dvth_vtroll;
+  real dvth_dibl;
+  real dvth_rsce;
+  real dvth_all;
+  real tmp;
+  real Theta_SCE;
+  real Theta_SW;
+  real Theta_DIBL;
+  real Theta_RSCE;
+  real Theta_DITS;
+  real Mnud;
+  real ves;
+  real vesx;
+  real vesmax;
+  real veseff;
+  real Mob;
+  real coxeff;
+  real Tcen0;
+  real Tcen;
+  real dvch_qm;
+  real MTcen;
+  real E0;
+  real E0prime;
+  real E1;
+  real E1prime;
+  real mx;
+  real mxprime;
+  real md;
+  real mdprime;
+  real gprime;
+  real gfactor;
+  real gam0;
+  real gam1;
+  real kT;
+  real Vdseff;
+  real qis;
+  real qid;
+  real qbs;
+  real Dmobs;
+  real qia;
+  real qia2;
+  real qba;
+  real dqi;
+  real qb0;
+  real eta_mu;
+  real eta_mu_cv;
+  real Eeffm;
+  real Eeffm_cv;
+  real Dmob;
+  real Dmob_cv;
+  real u0;
+  real ueff;
+  real u0_a;
+  real u0r;
+  real UA_t;
+  real UAR_t;
+  real UC_t;
+  real UCR_t;
+  real UCS_t;
+  real UD_t;
+  real UDR_t;
+  real U0_t;
+  real U0R_t;
+  real ETAMOB_t;
+  real Eeffs;
+  real EeffFactor;
+  real Dr;
+  real WeffWRFactor;
+  real RSourceGeo;
+  real RDrainGeo;
+  real RDSWMIN_i;
+  real RDWMIN_i;
+  real RSWMIN_i;
+  real Rdrain;
+  real Rsource;
+  real rdstemp;
+  real Rdsi;
+  real Rdss;
+  real RSDR_t;
+  real RSDRR_t;
+  real RDDR_t;
+  real RDDRR_t;
+  real DIBLfactor;
+  real PVAGfactor;
+  real diffVds;
+  real VaDIBL;
+  real Vgst2Vtm;
+  real Moc;
+  real Mclm;
+  real MclmCV;
+  real inv_MclmCV;
+  real Dvsat;
+  real Vdsat;
+  real inv_MEXP;
+  real DvsatCV;
+  real Nsat;
+  real VSAT_t;
+  real VSAT1_t;
+  real VSAT1R_t;
+  real VSATCV_t;
+  real MEXP_t;
+  real MEXPR_t;
+  real Esat;
+  real EsatL;
+  real Esat1;
+  real Esat1L;
+  real EsatCV;
+  real EsatCVL;
+  real WVCox;
+  real Ta;
+  real Tb;
+  real Tc;
+  real VSAT1_a;
+  real MEXP_a;
+  real PTWG_a;
+  real RSDR_a;
+  real RDDR_a;
+  real PDIBL1_a;
+  real VSAT_a;
+  real mu_max;
+  real mu_rsd;
+  real rhorsd;
+  real afin;
+  real thetarsp;
+  real Rsp;
+  real lt;
+  real arsd_total;
+  real prsd_total;
+  real alpha;
+  real eta;
+  real RrsdTML;
+  real Rrsdside;
+  real Rrsd;
+  real Rdsgeo;
+  real Arsd;
+  real Prsd;
+  real Hg;
+  real Wg;
+  real Trsd;
+  real Hrsd;
+  real Cgg_top;
+  real Cgg_side;
+  real Cfr_geo;
+  real Acorner;
+  real Ccorner;
+  real ggeltd;
+  real Rgeltd;
+  real Vaux_Igbinv;
+  real igbinv;
+  real igsd_mult;
+  real igsd_mult0;
+  real igbs;
+  real igbd;
+  real Voxacc;
+  real Vaux_Igbacc;
+  real vfbzb;
+  real igbacc;
+  real igcs;
+  real igcd;
+  real igc0;
+  real Vdseffx;
+  real T1_exp;
+  real igisl;
+  real igidl;
+  real vfbsd;
+  real igs;
+  real igd;
+  real vgs_eff;
+  real vgd_eff;
+  real Aechvb;
+  real Bechvb;
+  real Toxratio;
+  real Toxratioedge;
+  real Iii;
+  real Vdiff;
+  real Vdsatii;
+  real VgsStep;
+  real Ratio;
+  real ALPHAII;
+  real cox_acc;
+  real qg_acc;
+  real qb_acc;
+  real vge;
+  real qgs_ov;
+  real qgd_ov;
+  real qgs_fr;
+  real qgd_fr;
+  real qds_fr;
+  real qgs_parasitic;
+  real qgd_parasitic;
+  real Qes;
+  real Qed;
+  real Qeg;
+  real vgs_overlap;
+  real vgd_overlap;
+  real vge_overlap;
+  real cgsp;
+  real cgdp;
+  real csbox;
+  real cdbox;
+  real cgbox;
+  real vfbsdcv;
+  real Ies;
+  real Ied;
+  real ves_jct;
+  real ved_jct;
+  real vec;
+  real Czbs;
+  real Czbssw;
+  real Czbsswg;
+  real Czbd;
+  real Czbdsw;
+  real Czbdswg;
+  real pb2;
+  real arg;
+  real sarg;
+  real Qec;
+  real Qesj;
+  real Qesj1;
+  real Qesj2;
+  real Qesj3;
+  real Qedj;
+  real Qedj1;
+  real Qedj2;
+  real Qedj3;
+  real Isbs;
+  real Isbd;
+  real Nvtms;
+  real Nvtmd;
+  real SslpRev;
+  real IVjsmRev;
+  real VjsmRev;
+  real SslpFwd;
+  real IVjsmFwd;
+  real VjsmFwd;
+  real XExpBVS;
+  real DslpRev;
+  real IVjdmRev;
+  real VjdmRev;
+  real DslpFwd;
+  real IVjdmFwd;
+  real VjdmFwd;
+  real XExpBVD;
+  real igentemp;
+  real idsgen;
+  real LINTIGEN_i;
+  real LINTNOI_i;
+  real litl;
+  real Esatnoi;
+  real Leffnoi;
+  real Leffnoisq;
+  real DelClm;
+  real N0;
+  real Nl;
+  real Nstar;
+  real Ssi;
+  real Swi;
+  real FNPowerAt1Hz;
+  real NTNOI_i;
+  real qinv;
+  real Gtnoi;
+  real sid;
+  real gspr;
+  real gdpr;
+  real Abulk;
+  real etaa;
+  real gamma;
+  real delta;
+  real epsilon;
+  real gche;
+  real npart_beta;
+  real npart_theta;
+  real ctnoi;
+  real npart_c;
+  real noiGd0;
+  real GammaGd0;
+  real C0;
+  real sf;
+  real gth;
+  real cth;
+  real Inv_L;
+  real Inv_NFIN;
+  real Inv_LNFIN;
+  real NBODY_i;
+  real PHIG_i;
+  real CFD_i;
+  real CFS_i;
+  real COVS_i;
+  real COVD_i;
+  real CGSO_i;
+  real CGDO_i;
+  real CGSL_i;
+  real CGDL_i;
+  real CGBL_i;
+  real CKAPPAS_i;
+  real CKAPPAD_i;
+  real CKAPPAB_i;
+  real QMFACTOR_i;
+  real QMTCENCV_i;
+  real QMTCENCVA_i;
+  real KSATIV_i;
+  real KSATIVR_i;
+  real KSATIV_a;
+  real CDSC_i;
+  real CDSCD_i;
+  real CDSCD_a;
+  real CDSCDR_i;
+  real CIT_i;
+  real DVT0_i;
+  real CITR_i;
+  real CIT_a;
+  real DVT1_i;
+  real DVT1SS_i;
+  real PHIN_i;
+  real ETA0_i;
+  real ETA0_a;
+  real ETA0R_i;
+  real DSUB_i;
+  real VSAT_i;
+  real VSATR_i;
+  real VSATR_t;
+  real DVTP0_i;
+  real DVTP1_i;
+  real K0_i;
+  real K01_i;
+  real K0SI_i;
+  real K0SI1_i;
+  real K2SI_i;
+  real K2SI1_i;
+  real PHIBE_i;
+  real K1_i;
+  real K11_i;
+  real K2SAT_i;
+  real K2SAT1_i;
+  real DELTAVSAT_i;
+  real PSAT_i;
+  real DELTAVSATCV_i;
+  real PSATCV_i;
+  real VSAT1_i;
+  real VSAT1R_i;
+  real PTWG_i;
+  real PTWGR_i;
+  real VSATCV_i;
+  real UP_i;
+  real U0_i;
+  real U0R_i;
+  real ETAMOB_i;
+  real NGATE_i;
+  real RDSW_i;
+  real UPR_i;
+  real PRWGS_i;
+  real PRWGD_i;
+  real WR_i;
+  real PDIBL1_i;
+  real PDIBL1R_i;
+  real PDIBL2_i;
+  real PDIBL2R_i;
+  real PDIBL2_a;
+  real DROUT_i;
+  real PVAG_i;
+  real AIGBINV_i;
+  real AIGBINV1_i;
+  real BIGBINV_i;
+  real CIGBINV_i;
+  real EIGBINV_i;
+  real NIGBINV_i;
+  real AIGBACC_i;
+  real AIGBACC1_i;
+  real BIGBACC_i;
+  real CIGBACC_i;
+  real NIGBACC_i;
+  real AIGC_i;
+  real AIGC1_i;
+  real BIGC_i;
+  real CIGC_i;
+  real PIGCD_i;
+  real AIGS_i;
+  real AIGS1_i;
+  real BIGS_i;
+  real CIGS_i;
+  real NTOX_i;
+  real POXEDGE_i;
+  real AIGD_i;
+  real AIGD1_i;
+  real BIGD_i;
+  real CIGD_i;
+  real AGIDL_i;
+  real BGIDL_i;
+  real CGIDL_i;
+  real EGIDL_i;
+  real PGIDL_i;
+  real AGISL_i;
+  real BGISL_i;
+  real CGISL_i;
+  real EGISL_i;
+  real PGISL_i;
+  real ALPHA0_i;
+  real ALPHA1_i;
+  real ALPHAII0_i;
+  real ALPHAII1_i;
+  real BETA0_i;
+  real BETAII0_i;
+  real BETAII1_i;
+  real BETAII2_i;
+  real ESATII_i;
+  real LII_i;
+  real SII0_i;
+  real SII1_i;
+  real SII2_i;
+  real SIID_i;
+  real TII_i;
+  real MEXP_i;
+  real MEXPR_i;
+  real PCLM_i;
+  real PCLMG_i;
+  real PCLMCV_i;
+  real PCLM_a;
+  real PCLMR_i;
+  real A1_i;
+  real A2_i;
+  real A11_i;
+  real A21_i;
+  real K1RSCE_i;
+  real LPE0_i;
+  real DVTSHIFT_i;
+  real DVTSHIFT_a;
+  real DVTSHIFTR_i;
+  real UA_i;
+  real UC_i;
+  real EU_i;
+  real UD_i;
+  real UCS_i;
+  real UAR_i;
+  real EUR_i;
+  real UCR_i;
+  real UDR_i;
+  real UA_a;
+  real UD_a;
+  real UC_a;
+  real EU_a;
+  real UA1_i;
+  real UA1R_i;
+  real UC1_i;
+  real UD1_i;
+  real UCSTE_i;
+  real UTE_i;
+  real UTL_i;
+  real EMOBT_i;
+  real UC1R_i;
+  real UD1R_i;
+  real UTER_i;
+  real UTLR_i;
+  real PTWGT_i;
+  real AT_i;
+  real ATCV_i;
+  real ATR_i;
+  real RDW_i;
+  real RSW_i;
+  real PRT_i;
+  real KT1_i;
+  real TSS_i;
+  real IIT_i;
+  real IGT_i;
+  real TGIDL_i;
+  real NTGEN_i;
+  real AIGEN_i;
+  real BIGEN_i;
+  real K0SISAT_i;
+  real K0SISAT1_i;
+  real K2SISAT_i;
+  real K2SISAT1_i;
+  real K2_i;
+  real K21_i;
+  real Cins;
+  real Ach;
+  real Weff_UFCM;
+  real qdep;
+  real rc;
+  real vth_fixed_factor_Sub;
+  real vth_fixed_factor_SI;
+  real qm;
+  real Qdep_ov_Cins;
+  real qi_acc_for_QM;
+  real fieldnormalizationfactor;
+  real auxQMfact;
+  real QMFACTORCVfinal;
+  real psipclamp;
+  real sqrtpsip;
+  real nq;
+  real F0;
+///////////////////// variable definition end ///////////////////////
+
+///////////////////// function definition start /////////////////////
+  analog function real lexp;
+    input x;
+    real x;
+
+    begin
+      if (x > `EXPL_THRESHOLD) begin
+        lexp = `MAX_EXPL * (1.0 + x - `EXPL_THRESHOLD);
+      end else if (x < -`EXPL_THRESHOLD) begin
+        lexp = `MIN_EXPL;
+      end else begin
+        lexp = exp(x);
+      end
+    end
+  endfunction
+
+  analog function real lln;
+    input x;
+    real x;
+
+    begin
+      lln = ln(max(x, `N_MINLOG));
+    end
+  endfunction
+
+  analog function real hypsmooth;
+    input x, c;
+    real x, c;
+
+    begin
+      hypsmooth = 0.5 * (x + sqrt(x * x + 4.0 * c * c));
+    end
+  endfunction
+
+  analog function real hypmax;
+    input x, xmin, c;
+    real x, xmin, c;
+
+    begin
+      hypmax = xmin + 0.5 * (x - xmin - c + sqrt((x - xmin - c) * (x - xmin - c) - 4.0 * xmin * c));
+    end
+  endfunction
+
+  analog function real Tempdep;
+    input PARAML, PARAMT, DELTEMP, TEMPMOD;
+    real PARAML, PARAMT, DELTEMP, TEMPMOD;
+
+    begin
+      if (TEMPMOD != 0) begin
+        Tempdep = PARAML + hypmax(PARAMT * DELTEMP, -PARAML, 1.0e-6);
+      end else begin
+        Tempdep = PARAML * hypsmooth(1.0 + PARAMT * DELTEMP - 1.0e-6, 1.0e-3);
+      end
+    end
+  endfunction
+///////////////////// function definition end ///////////////////////
+
+///////////////////// main definition start /////////////////////////
+  analog begin
+    begin : CMGBiasIndepCalc
+      qid = 0.0;
+      qis = 0.0;
+      qba = 0.0;
+      T11 = 0.0;
+      T12 = 0.0;
+      ids = 0.0;
+      sigvds = 0.0;
+      Iii = 0.0;
+      qd = 0.0;
+      qg = 0.0;
+      qs = 0.0;
+      qb = 0.0;
+      Weff0 = 0.0;
+      WeffCV0 = 0.0;
+      CJS_t = 0.0;
+      CJSWS_t = 0.0;
+      CJSWGS_t = 0.0;
+      CJD_t = 0.0;
+      CJSWD_t = 0.0;
+      CJSWGD_t = 0.0;
+      PBS_t = 0.0;
+      PBSWS_t = 0.0;
+      PBSWGS_t = 0.0;
+      PBD_t = 0.0;
+      PBSWD_t = 0.0;
+      PBSWGD_t = 0.0;
+      JSS_t = 0.0;
+      JSWS_t = 0.0;
+      JSWGS_t = 0.0;
+      JSD_t = 0.0;
+      JSWD_t = 0.0;
+      JSWGD_t = 0.0;
+      JTSS_t = 0.0;
+      JTSSWS_t = 0.0;
+      JTSSWGS_t = 0.0;
+      JTSD_t = 0.0;
+      JTSSWD_t = 0.0;
+      JTSSWGD_t = 0.0;
+      NJTS_t = 0.0;
+      NJTSSW_t = 0.0;
+      NJTSSWG_t = 0.0;
+      NJTSD_t = 0.0;
+      NJTSSWD_t = 0.0;
+      NJTSSWGD_t = 0.0;
+      Ies = 0.0;
+      Ied = 0.0;
+      Czbs = 0.0;
+      Czbssw = 0.0;
+      Czbsswg = 0.0;
+      Czbd = 0.0;
+      Czbdsw = 0.0;
+      Czbdswg = 0.0;
+      Qes = 0.0;
+      Qed = 0.0;
+      Qeg = 0.0;
+      Isbs = 0.0;
+      Isbd = 0.0;
+      Nvtms = 0.0;
+      Nvtmd = 0.0;
+      SslpRev = 0.0;
+      IVjsmRev = 0.0;
+      VjsmRev = 0.0;
+      SslpFwd = 0.0;
+      IVjsmFwd = 0.0;
+      VjsmFwd = 0.0;
+      DslpRev = 0.0;
+      IVjdmRev = 0.0;
+      VjdmRev = 0.0;
+      DslpFwd = 0.0;
+      IVjdmFwd = 0.0;
+      VjdmFwd = 0.0;
+      XExpBVS = 0.0;
+      XExpBVD = 0.0;
+      idsgen = 0.0;
+      q0 = 0.0;
+      Tcen = 0.0;
+      MTcen = 0.0;
+      Rdrain = 0.0;
+      Rsource = 0.0;
+      Cfr_geo = 0.0;
+      igbinv = 0.0;
+      igbs = 0.0;
+      igbd = 0.0;
+      igbacc = 0.0;
+      igcs = 0.0;
+      igcd = 0.0;
+      igidl = 0.0;
+      igisl = 0.0;
+      igs = 0.0;
+      igd = 0.0;
+      cox_acc = 0.0;
+      CGSO_i = 0.0;
+      CGDO_i = 0.0;
+      qb_acc = 0.0;
+      qg_acc = 0.0;
+      qgs_fr = 0.0;
+      qgd_fr = 0.0;
+      qds_fr = 0.0;
+      qgs_parasitic = 0.0;
+      qgd_parasitic = 0.0;
+      FNPowerAt1Hz = 0.0;
+      Gtnoi = 0.0;
+      gspr = 0.0;
+      gdpr = 0.0;
+      Dr = 1.0;
+      CDSCDR_i = 0.0;
+      ETA0R_i = 0.0;
+      VSAT1R_i = 0.0;
+      VSAT1R_t = 0.0;
+      MEXPR_i = 0.0;
+      MEXPR_t = 0.0;
+      PTWGR_i = 0.0;
+      PTWGR_t = 0.0;
+      PDIBL1R_i = 0.0;
+      PDIBL2R_i = 0.0;
+      PHIBE_i = 0.0;
+      K1_i = 0.0;
+      K11_i = 0.0;
+      K2SAT_i = 0.0;
+      K2SAT1_i = 0.0;
+      KSATIVR_i = 0.0;
+      K2_i = 0.0;
+      K21_i = 0.0;
+      UC_i = 0.0;
+      UC1_i = 0.0;
+      UC_t = 0.0;
+      U0R_i = 0.0;
+      UPR_i = 0.0;
+      EUR_i = 0.0;
+      ATR_i = 0.0;
+      CITR_i = 0.0;
+      ETA0R_i = 0.0;
+      DVTP0_i = 0.0;
+      DVTP1_i = 0.0;
+      PDIBL2R_i = 0.0;
+      PCLMR_i = 0.0;
+      LeffCV_acc = 0.0;
+      RDDRR_t = 0.0;
+      RSDRR_t = 0.0;
+      Rdsi = 0.0;
+      T3 = 0.0;
+      Tcen0 = 0.0;
+      veseff = 0.0;
+      U0R_t = 0.0;
+      UAR_t = 0.0;
+      UCR_t = 0.0;
+      UDR_t = 0.0;
+      VSAT_a = 0.0;
+      DVTSHIFTR_i = 0.0;
+      UA1R_i = 0.0;
+      UAR_i = 0.0;
+      UC1R_i = 0.0;
+      UCR_i = 0.0;
+      UD1R_i = 0.0;
+      UDR_i = 0.0;
+      UTER_i = 0.0;
+      UTLR_i = 0.0;
+      VSATR_i = 0.0;
+      VSATR_t = 0.0;
+      u0r = 0.0;
+      sid = 0.0;
+      ctnoi = 0.0;
+      sf = 0.0;
+      C0 = 0.0;
+      gamma = 0.0;
+      delta = 0.0;
+      ggeltd = 0.0;
+      qm = 1.0;
+      Cins = 1.0;
+      Ach = 1.0;
+      Weff_UFCM = 1.0;
+      qdep = -1.0;
+      rc = 1.0;
+      vth_fixed_factor_Sub = 1.0;
+      vth_fixed_factor_SI = 1.0;
+      qi_acc_for_QM = 0.0;
+      fieldnormalizationfactor = 0.0;
+      auxQMfact = 0.0;
+      QMFACTORCVfinal = 0.0;
+      psipclamp = 1.0;
+      sqrtpsip = 1.0;
+      nq = 1.0;
+      F0 = 0.0;
+      e0 = 0.0;
+      e1 = 0.0;
+      e2 = 0.0;
+      Qdep_ov_Cins = 0.0;
+      if (TYPE == 1) begin
+        devsign = 1;
+      end
+      else begin
+        devsign = -1;
+      end
+      epssub = EPSRSUB * 8.8542e-12;
+      epssp = EPSRSP * 8.8542e-12;
+      cbox = EPSROX * 8.8542e-12 / EOTBOX;
+      epsratio = EPSRSUB / EPSROX;
+      if ($port_connected(t) == 1) begin
+        if (SHMOD == 0) begin
+          if (SH_WARN == 1) begin
+            $strobe("The optional 5th terminal is present but not active because SHMOD=0.");
+          end
+        end
+      end
+      mx = 0.916 * 9.11e-31;
+      mxprime = 0.190 * 9.11e-31;
+      md = 0.190 * 9.11e-31;
+      mdprime = 0.417 * 9.11e-31;
+      gprime = 4.0;
+      gfactor = 2.0;
+      Lg = L + XL;
+      deltaL = LINT + LL * pow(Lg, -LLN);
+      deltaL1 = LINT + LL * pow(Lg + DLBIN, -LLN);
+      deltaLCV = DLC + LLC * pow(Lg, -LLN);
+      Leff = Lg - 2.0 * deltaL;
+      Leff1 = Lg + DLBIN - 2.0 * deltaL1;
+      LeffCV = Lg - 2.0 * deltaLCV;
+      if (BULKMOD != 0)
+        LeffCV_acc = LeffCV - DLCACC;
+      NFINtotal = NFIN * NF;
+      if (Leff <= 0.0) begin
+        $strobe("Fatal: Leff = %e is not positive.", Leff);
+        $finish;
+      end
+      else
+        if (Leff <= 1.0e-9) begin
+          $strobe("Warning: Leff = %e <= 1.0e-9.", Leff);
+        end
+      if (Leff1 <= 0.0) begin
+        $strobe("Fatal: Leff1 = %e is not positive.", Leff1);
+        $finish;
+      end
+      else
+        if (Leff1 <= 1.0e-9) begin
+          $strobe("Warning: Leff1 = %e <= 1.0e-9.", Leff1);
+        end
+      Inv_L = 1.0e-6 / Leff1;
+      Inv_NFIN = 1.0 / NFIN;
+      Inv_LNFIN = 1.0e-6 / (Leff1 * NFIN);
+      NBODY_i = NBODY + Inv_L * LNBODY + Inv_NFIN * NNBODY + Inv_LNFIN * PNBODY;
+      if (NBODYN1 != 0.0) begin
+        NBODY_i = NBODY_i * (1.0 + NBODYN1 / NFIN * lln(1.0 + NFIN / NBODYN2));
+      end
+      case (GEOMOD)         0: begin
+          if (!$param_given(TFIN_TOP) || !$param_given(TFIN_BASE)) begin
+            Weff_UFCM = 2.0 * HFIN;
+            Cins = Weff_UFCM * EPSROX * 8.8542e-12 / EOT;
+            Ach = HFIN * TFIN;
+            rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+            Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+          end
+          else begin
+            Weff_UFCM = 2.0 * sqrt(HFIN * HFIN + (TFIN_TOP - TFIN_BASE) * (TFIN_TOP - TFIN_BASE) / 4.0);
+            Cins = Weff_UFCM * EPSROX * 8.8542e-12 / EOT;
+            Ach = HFIN * (TFIN_TOP + TFIN_BASE) / 2.0;
+            rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+            Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+          end
+        end
+
+        1: begin
+          if (!$param_given(TFIN_TOP) || !$param_given(TFIN_BASE)) begin
+            Weff_UFCM = 2.0 * HFIN + TFIN;
+            Cins = Weff_UFCM * EPSROX * 8.8542e-12 / EOT;
+            Ach = HFIN * TFIN;
+            rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+            Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+          end
+          else begin
+            Weff_UFCM = 2.0 * sqrt(HFIN * HFIN + (TFIN_TOP - TFIN_BASE) * (TFIN_TOP - TFIN_BASE) / 4.0) + TFIN_TOP;
+            Cins = Weff_UFCM * EPSROX * 8.8542e-12 / EOT;
+            Ach = HFIN * (TFIN_TOP + TFIN_BASE) / 2.0;
+            rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+            Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+          end
+        end
+
+        2: begin
+          if (!$param_given(TFIN_TOP) || !$param_given(TFIN_BASE)) begin
+            Weff_UFCM = 2.0 * HFIN + 2.0 * TFIN;
+            Cins = Weff_UFCM * EPSROX * 8.8542e-12 / EOT;
+            Ach = HFIN * TFIN;
+            rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+            Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+          end
+          else begin
+            Weff_UFCM = 2.0 * sqrt(HFIN * HFIN + (TFIN_TOP - TFIN_BASE) * (TFIN_TOP - TFIN_BASE) / 4.0) + TFIN_TOP + TFIN_BASE;
+            Cins = Weff_UFCM * EPSROX * 8.8542e-12 / EOT;
+            Ach = HFIN * (TFIN_TOP + TFIN_BASE) / 2.0;
+            rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+            Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+          end
+        end
+
+        3: begin
+          Weff_UFCM = 3.14159265358979323846 * D;
+          Cins = 2.0 * 3.14159265358979323846 * EPSROX * 8.8542e-12 / ln(1.0 + 2.0 * EOT / D);
+          Ach = 3.14159265358979323846 * D * D / 4.0;
+          rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+          Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+        end
+
+        4: begin
+          Weff_UFCM = W_UFCM;
+          Cins = CINS_UFCM;
+          Ach = ACH_UFCM;
+          rc = (2.0 * Cins / (Weff_UFCM * Weff_UFCM * epssub / Ach));
+          Qdep_ov_Cins = -1.60219e-19 * NBODY_i * Ach / Cins;
+        end
+
+      endcase
+      cox = Cins / Weff_UFCM;
+      if (BULKMOD != 0) begin
+        cox_acc = cox * EOT / EOTACC;
+      end
+      Weff0 = Weff_UFCM - DELTAW;
+      WeffCV0 = Weff_UFCM - DELTAWCV;
+      scl = sqrt((epssub * Ach / Cins) * (1.0 + Ach * Cins / (2.0 * epssub * Weff_UFCM * Weff_UFCM)));
+      PHIG_i = PHIG + Inv_L * LPHIG + Inv_NFIN * NPHIG + Inv_LNFIN * PPHIG;
+      NGATE_i = NGATE + Inv_L * LNGATE + Inv_NFIN * NNGATE + Inv_LNFIN * PNGATE;
+      CIT_i = CIT + Inv_L * LCIT + Inv_NFIN * NCIT + Inv_LNFIN * PCIT;
+      CDSC_i = CDSC + Inv_L * LCDSC + Inv_NFIN * NCDSC + Inv_LNFIN * PCDSC;
+      CDSCD_i = CDSCD + Inv_L * LCDSCD + Inv_NFIN * NCDSCD + Inv_LNFIN * PCDSCD;
+      DVT0_i = DVT0 + Inv_L * LDVT0 + Inv_NFIN * NDVT0 + Inv_LNFIN * PDVT0;
+      DVT1_i = DVT1 + Inv_L * LDVT1 + Inv_NFIN * NDVT1 + Inv_LNFIN * PDVT1;
+      DVT1SS_i = DVT1SS + Inv_L * LDVT1SS + Inv_NFIN * NDVT1SS + Inv_LNFIN * PDVT1SS;
+      PHIN_i = PHIN + Inv_L * LPHIN + Inv_NFIN * NPHIN + Inv_LNFIN * PPHIN;
+      ETA0_i = ETA0 + Inv_L * LETA0 + Inv_NFIN * NETA0 + Inv_LNFIN * PETA0;
+      DSUB_i = DSUB + Inv_L * LDSUB + Inv_NFIN * NDSUB + Inv_LNFIN * PDSUB;
+      K1RSCE_i = K1RSCE + Inv_L * LK1RSCE + Inv_NFIN * NK1RSCE + Inv_LNFIN * PK1RSCE;
+      LPE0_i = LPE0 + Inv_L * LLPE0 + Inv_NFIN * NLPE0 + Inv_LNFIN * PLPE0;
+      DVTSHIFT_i = DVTSHIFT + Inv_L * LDVTSHIFT + Inv_NFIN * NDVTSHIFT + Inv_LNFIN * PDVTSHIFT;
+      K0_i = K0 + Inv_L * LK0 + Inv_NFIN * NK0 + Inv_LNFIN * PK0;
+      K01_i = K01 + Inv_L * LK01 + Inv_NFIN * NK01 + Inv_LNFIN * PK01;
+      K0SI_i = K0SI + Inv_L * LK0SI + Inv_NFIN * NK0SI + Inv_LNFIN * PK0SI;
+      K0SI1_i = K0SI1 + Inv_L * LK0SI1 + Inv_NFIN * NK0SI1 + Inv_LNFIN * PK0SI1;
+      K2SI_i = K2SI + Inv_L * LK2SI + Inv_NFIN * NK2SI + Inv_LNFIN * PK2SI;
+      K2SI1_i = K2SI1 + Inv_L * LK2SI1 + Inv_NFIN * NK2SI1 + Inv_LNFIN * PK2SI1;
+      K0SISAT_i = K0SISAT + Inv_L * LK0SISAT + Inv_NFIN * NK0SISAT + Inv_LNFIN * PK0SISAT;
+      K0SISAT1_i = K0SISAT1 + Inv_L * LK0SISAT1 + Inv_NFIN * NK0SISAT1 + Inv_LNFIN * PK0SISAT1;
+      K2SISAT_i = K2SISAT + Inv_L * LK2SISAT + Inv_NFIN * NK2SISAT + Inv_LNFIN * PK2SISAT;
+      K2SISAT1_i = K2SISAT1 + Inv_L * LK2SISAT1 + Inv_NFIN * NK2SISAT1 + Inv_LNFIN * PK2SISAT1;
+      if (BULKMOD != 0) begin
+        if (BULKMOD == 2) begin
+          K2_i = K2 + Inv_L * LK2 + Inv_NFIN * NK2 + Inv_LNFIN * PK2;
+          K21_i = K21 + Inv_L * LK21 + Inv_NFIN * NK21 + Inv_LNFIN * PK21;
+          K2SAT_i = K2SAT + Inv_L * LK2SAT + Inv_NFIN * NK2SAT + Inv_LNFIN * PK2SAT;
+          K2SAT1_i = K2SAT1 + Inv_L * LK2SAT1 + Inv_NFIN * NK2SAT1 + Inv_LNFIN * PK2SAT1;
+        end
+        PHIBE_i = PHIBE + Inv_L * LPHIBE + Inv_NFIN * NPHIBE + Inv_LNFIN * PPHIBE;
+        K1_i = K1 + Inv_L * LK1 + Inv_NFIN * NK1 + Inv_LNFIN * PK1;
+        K11_i = K11 + Inv_L * LK11 + Inv_NFIN * NK11 + Inv_LNFIN * PK11;
+      end
+      QMFACTOR_i = QMFACTOR + Inv_L * LQMFACTOR + Inv_NFIN * NQMFACTOR + Inv_LNFIN * PQMFACTOR;
+      QMTCENCV_i = QMTCENCV + Inv_L * LQMTCENCV + Inv_NFIN * NQMTCENCV + Inv_LNFIN * PQMTCENCV;
+      QMTCENCVA_i = QMTCENCVA + Inv_L * LQMTCENCVA + Inv_NFIN * NQMTCENCVA + Inv_LNFIN * PQMTCENCVA;
+      VSAT_i = VSAT + Inv_L * LVSAT + Inv_NFIN * NVSAT + Inv_LNFIN * PVSAT;
+      VSAT1_i = VSAT1 + Inv_L * LVSAT1 + Inv_NFIN * NVSAT1 + Inv_LNFIN * PVSAT1;
+      VSATCV_i = VSATCV + Inv_L * LVSATCV + Inv_NFIN * NVSATCV + Inv_LNFIN * PVSATCV;
+      DELTAVSAT_i = DELTAVSAT + Inv_L * LDELTAVSAT + Inv_NFIN * NDELTAVSAT + Inv_LNFIN * PDELTAVSAT;
+      PSAT_i = PSAT + Inv_L * LPSAT + Inv_NFIN * NPSAT + Inv_LNFIN * PPSAT;
+      DELTAVSATCV_i = DELTAVSATCV + Inv_L * LDELTAVSATCV + Inv_NFIN * NDELTAVSATCV + Inv_LNFIN * PDELTAVSATCV;
+      PSATCV_i = PSATCV + Inv_L * LPSATCV + Inv_NFIN * NPSATCV + Inv_LNFIN * PPSATCV;
+      KSATIV_i = KSATIV + Inv_L * LKSATIV + Inv_NFIN * NKSATIV + Inv_LNFIN * PKSATIV;
+      MEXP_i = MEXP + Inv_L * LMEXP + Inv_NFIN * NMEXP + Inv_LNFIN * PMEXP;
+      PTWG_i = PTWG + Inv_L * LPTWG + Inv_NFIN * NPTWG + Inv_LNFIN * PPTWG;
+      U0_i = U0 + Inv_L * LU0 + Inv_NFIN * NU0 + Inv_LNFIN * PU0;
+      ETAMOB_i = ETAMOB + Inv_L * LETAMOB + Inv_NFIN * NETAMOB + Inv_LNFIN * PETAMOB;
+      UP_i = UP + Inv_L * LUP + Inv_NFIN * NUP + Inv_LNFIN * PUP;
+      UA_i = UA + Inv_L * LUA + Inv_NFIN * NUA + Inv_LNFIN * PUA;
+      if (BULKMOD != 0) begin
+        UC_i = UC + Inv_L * LUC + Inv_NFIN * NUC + Inv_LNFIN * PUC;
+      end
+      EU_i = EU + Inv_L * LEU + Inv_NFIN * NEU + Inv_LNFIN * PEU;
+      UD_i = UD + Inv_L * LUD + Inv_NFIN * NUD + Inv_LNFIN * PUD;
+      UCS_i = UCS + Inv_L * LUCS + Inv_NFIN * NUCS + Inv_LNFIN * PUCS;
+      PCLM_i = PCLM + Inv_L * LPCLM + Inv_NFIN * NPCLM + Inv_LNFIN * PPCLM;
+      PCLMG_i = PCLMG + Inv_L * LPCLMG + Inv_NFIN * NPCLMG + Inv_LNFIN * PPCLMG;
+      PCLMCV_i = PCLMCV + Inv_L * LPCLMCV + Inv_NFIN * NPCLMCV + Inv_LNFIN * PPCLMCV;
+      A1_i = A1 + Inv_L * LA1 + Inv_NFIN * NA1 + Inv_LNFIN * PA1;
+      A11_i = A11 + Inv_L * LA11 + Inv_NFIN * NA11 + Inv_LNFIN * PA11;
+      A2_i = A2 + Inv_L * LA2 + Inv_NFIN * NA2 + Inv_LNFIN * PA2;
+      A21_i = A21 + Inv_L * LA21 + Inv_NFIN * NA21 + Inv_LNFIN * PA21;
+      RDSW_i = RDSW + Inv_L * LRDSW + Inv_NFIN * NRDSW + Inv_LNFIN * PRDSW;
+      RSW_i = RSW + Inv_L * LRSW + Inv_NFIN * NRSW + Inv_LNFIN * PRSW;
+      RDW_i = RDW + Inv_L * LRDW + Inv_NFIN * NRDW + Inv_LNFIN * PRDW;
+      PRWGD_i = PRWGD + Inv_L * LPRWGD + Inv_NFIN * NPRWGD + Inv_LNFIN * PPRWGD;
+      PRWGS_i = PRWGS + Inv_L * LPRWGS + Inv_NFIN * NPRWGS + Inv_LNFIN * PPRWGS;
+      WR_i = WR + Inv_L * LWR + Inv_NFIN * NWR + Inv_LNFIN * PWR;
+      PDIBL1_i = PDIBL1 + Inv_L * LPDIBL1 + Inv_NFIN * NPDIBL1 + Inv_LNFIN * PPDIBL1;
+      PDIBL2_i = PDIBL2 + Inv_L * LPDIBL2 + Inv_NFIN * NPDIBL2 + Inv_LNFIN * PPDIBL2;
+      DROUT_i = DROUT + Inv_L * LDROUT + Inv_NFIN * NDROUT + Inv_LNFIN * PDROUT;
+      PVAG_i = PVAG + Inv_L * LPVAG + Inv_NFIN * NPVAG + Inv_LNFIN * PPVAG;
+      AIGBINV_i = AIGBINV + Inv_L * LAIGBINV + Inv_NFIN * NAIGBINV + Inv_LNFIN * PAIGBINV;
+      AIGBINV1_i = AIGBINV1 + Inv_L * LAIGBINV1 + Inv_NFIN * NAIGBINV1 + Inv_LNFIN * PAIGBINV1;
+      BIGBINV_i = BIGBINV + Inv_L * LBIGBINV + Inv_NFIN * NBIGBINV + Inv_LNFIN * PBIGBINV;
+      CIGBINV_i = CIGBINV + Inv_L * LCIGBINV + Inv_NFIN * NCIGBINV + Inv_LNFIN * PCIGBINV;
+      EIGBINV_i = EIGBINV + Inv_L * LEIGBINV + Inv_NFIN * NEIGBINV + Inv_LNFIN * PEIGBINV;
+      NIGBINV_i = NIGBINV + Inv_L * LNIGBINV + Inv_NFIN * NNIGBINV + Inv_LNFIN * PNIGBINV;
+      AIGBACC_i = AIGBACC + Inv_L * LAIGBACC + Inv_NFIN * NAIGBACC + Inv_LNFIN * PAIGBACC;
+      AIGBACC1_i = AIGBACC1 + Inv_L * LAIGBACC1 + Inv_NFIN * NAIGBACC1 + Inv_LNFIN * PAIGBACC1;
+      BIGBACC_i = BIGBACC + Inv_L * LBIGBACC + Inv_NFIN * NBIGBACC + Inv_LNFIN * PBIGBACC;
+      CIGBACC_i = CIGBACC + Inv_L * LCIGBACC + Inv_NFIN * NCIGBACC + Inv_LNFIN * PCIGBACC;
+      NIGBACC_i = NIGBACC + Inv_L * LNIGBACC + Inv_NFIN * NNIGBACC + Inv_LNFIN * PNIGBACC;
+      AIGC_i = AIGC + Inv_L * LAIGC + Inv_NFIN * NAIGC + Inv_LNFIN * PAIGC;
+      AIGC1_i = AIGC1 + Inv_L * LAIGC1 + Inv_NFIN * NAIGC1 + Inv_LNFIN * PAIGC1;
+      BIGC_i = BIGC + Inv_L * LBIGC + Inv_NFIN * NBIGC + Inv_LNFIN * PBIGC;
+      CIGC_i = CIGC + Inv_L * LCIGC + Inv_NFIN * NCIGC + Inv_LNFIN * PCIGC;
+      PIGCD_i = PIGCD + Inv_L * LPIGCD + Inv_NFIN * NPIGCD + Inv_LNFIN * PPIGCD;
+      AIGS_i = AIGS + Inv_L * LAIGS + Inv_NFIN * NAIGS + Inv_LNFIN * PAIGS;
+      AIGS1_i = AIGS1 + Inv_L * LAIGS1 + Inv_NFIN * NAIGS1 + Inv_LNFIN * PAIGS1;
+      BIGS_i = BIGS + Inv_L * LBIGS + Inv_NFIN * NBIGS + Inv_LNFIN * PBIGS;
+      CIGS_i = CIGS + Inv_L * LCIGS + Inv_NFIN * NCIGS + Inv_LNFIN * PCIGS;
+      AIGD_i = AIGD + Inv_L * LAIGD + Inv_NFIN * NAIGD + Inv_LNFIN * PAIGD;
+      AIGD1_i = AIGD1 + Inv_L * LAIGD1 + Inv_NFIN * NAIGD1 + Inv_LNFIN * PAIGD1;
+      BIGD_i = BIGD + Inv_L * LBIGD + Inv_NFIN * NBIGD + Inv_LNFIN * PBIGD;
+      CIGD_i = CIGD + Inv_L * LCIGD + Inv_NFIN * NCIGD + Inv_LNFIN * PCIGD;
+      NTOX_i = NTOX + Inv_L * LNTOX + Inv_NFIN * NNTOX + Inv_LNFIN * PNTOX;
+      POXEDGE_i = POXEDGE + Inv_L * LPOXEDGE + Inv_NFIN * NPOXEDGE + Inv_LNFIN * PPOXEDGE;
+      AGIDL_i = AGIDL + Inv_L * LAGIDL + Inv_NFIN * NAGIDL + Inv_LNFIN * PAGIDL;
+      BGIDL_i = BGIDL + Inv_L * LBGIDL + Inv_NFIN * NBGIDL + Inv_LNFIN * PBGIDL;
+      CGIDL_i = CGIDL + Inv_L * LCGIDL + Inv_NFIN * NCGIDL + Inv_LNFIN * PCGIDL;
+      EGIDL_i = EGIDL + Inv_L * LEGIDL + Inv_NFIN * NEGIDL + Inv_LNFIN * PEGIDL;
+      PGIDL_i = PGIDL + Inv_L * LPGIDL + Inv_NFIN * NPGIDL + Inv_LNFIN * PPGIDL;
+      AGISL_i = AGISL + Inv_L * LAGISL + Inv_NFIN * NAGISL + Inv_LNFIN * PAGISL;
+      BGISL_i = BGISL + Inv_L * LBGISL + Inv_NFIN * NBGISL + Inv_LNFIN * PBGISL;
+      CGISL_i = CGISL + Inv_L * LCGISL + Inv_NFIN * NCGISL + Inv_LNFIN * PCGISL;
+      EGISL_i = EGISL + Inv_L * LEGISL + Inv_NFIN * NEGISL + Inv_LNFIN * PEGISL;
+      PGISL_i = PGISL + Inv_L * LPGISL + Inv_NFIN * NPGISL + Inv_LNFIN * PPGISL;
+      ALPHA0_i = ALPHA0 + Inv_L * LALPHA0 + Inv_NFIN * NALPHA0 + Inv_LNFIN * PALPHA0;
+      ALPHA1_i = ALPHA1 + Inv_L * LALPHA1 + Inv_NFIN * NALPHA1 + Inv_LNFIN * PALPHA1;
+      ALPHAII0_i = ALPHAII0 + Inv_L * LALPHAII0 + Inv_NFIN * NALPHAII0 + Inv_LNFIN * PALPHAII0;
+      ALPHAII1_i = ALPHAII1 + Inv_L * LALPHAII1 + Inv_NFIN * NALPHAII1 + Inv_LNFIN * PALPHAII1;
+      BETA0_i = BETA0 + Inv_L * LBETA0 + Inv_NFIN * NBETA0 + Inv_LNFIN * PBETA0;
+      BETAII0_i = BETAII0 + Inv_L * LBETAII0 + Inv_NFIN * NBETAII0 + Inv_LNFIN * PBETAII0;
+      BETAII1_i = BETAII1 + Inv_L * LBETAII1 + Inv_NFIN * NBETAII1 + Inv_LNFIN * PBETAII1;
+      BETAII2_i = BETAII2 + Inv_L * LBETAII2 + Inv_NFIN * NBETAII2 + Inv_LNFIN * PBETAII2;
+      ESATII_i = ESATII + Inv_L * LESATII + Inv_NFIN * NESATII + Inv_LNFIN * PESATII;
+      LII_i = LII + Inv_L * LLII + Inv_NFIN * NLII + Inv_LNFIN * PLII;
+      SII0_i = SII0 + Inv_L * LSII0 + Inv_NFIN * NSII0 + Inv_LNFIN * PSII0;
+      SII1_i = SII1 + Inv_L * LSII1 + Inv_NFIN * NSII1 + Inv_LNFIN * PSII1;
+      SII2_i = SII2 + Inv_L * LSII2 + Inv_NFIN * NSII2 + Inv_LNFIN * PSII2;
+      SIID_i = SIID + Inv_L * LSIID + Inv_NFIN * NSIID + Inv_LNFIN * PSIID;
+      TII_i = TII + Inv_L * LTII + Inv_NFIN * NTII + Inv_LNFIN * PTII;
+      CFS_i = CFS + Inv_L * LCFS + Inv_NFIN * NCFS + Inv_LNFIN * PCFS;
+      CFD_i = CFD + Inv_L * LCFD + Inv_NFIN * NCFD + Inv_LNFIN * PCFD;
+      COVS_i = COVS + Inv_L * LCOVS + Inv_NFIN * NCOVS + Inv_LNFIN * PCOVS;
+      COVD_i = COVD + Inv_L * LCOVD + Inv_NFIN * NCOVD + Inv_LNFIN * PCOVD;
+      CGSL_i = CGSL + Inv_L * LCGSL + Inv_NFIN * NCGSL + Inv_LNFIN * PCGSL;
+      CGDL_i = CGDL + Inv_L * LCGDL + Inv_NFIN * NCGDL + Inv_LNFIN * PCGDL;
+      CGBL_i = CGBL + Inv_L * LCGBL + Inv_NFIN * NCGBL + Inv_LNFIN * PCGBL;
+      CKAPPAS_i = CKAPPAS + Inv_L * LCKAPPAS + Inv_NFIN * NCKAPPAS + Inv_LNFIN * PCKAPPAS;
+      CKAPPAD_i = CKAPPAD + Inv_L * LCKAPPAD + Inv_NFIN * NCKAPPAD + Inv_LNFIN * PCKAPPAD;
+      CKAPPAB_i = CKAPPAB + Inv_L * LCKAPPAB + Inv_NFIN * NCKAPPAB + Inv_LNFIN * PCKAPPAB;
+      NTGEN_i = NTGEN + Inv_L * LNTGEN + Inv_NFIN * NNTGEN + Inv_LNFIN * PNTGEN;
+      AIGEN_i = AIGEN + Inv_L * LAIGEN + Inv_NFIN * NAIGEN + Inv_LNFIN * PAIGEN;
+      BIGEN_i = BIGEN + Inv_L * LBIGEN + Inv_NFIN * NBIGEN + Inv_LNFIN * PBIGEN;
+      if (ASYMMOD != 0) begin
+        CDSCDR_i = CDSCDR + Inv_L * LCDSCDR + Inv_NFIN * NCDSCDR + Inv_LNFIN * PCDSCDR;
+        CITR_i = CITR + Inv_L * LCITR + Inv_NFIN * NCITR + Inv_LNFIN * PCITR;
+        ETA0R_i = ETA0R + Inv_L * LETA0R + Inv_NFIN * NETA0R + Inv_LNFIN * PETA0R;
+        VSAT1R_i = VSAT1R + Inv_L * LVSAT1R + Inv_NFIN * NVSAT1R + Inv_LNFIN * PVSAT1R;
+        MEXPR_i = MEXPR + Inv_L * LMEXPR + Inv_NFIN * NMEXPR + Inv_LNFIN * PMEXPR;
+        PTWGR_i = PTWGR + Inv_L * LPTWGR + Inv_NFIN * NPTWGR + Inv_LNFIN * PPTWGR;
+        PDIBL1R_i = PDIBL1R + Inv_L * LPDIBL1R + Inv_NFIN * NPDIBL1R + Inv_LNFIN * PPDIBL1R;
+        PDIBL2R_i = PDIBL2R + Inv_L * LPDIBL2R + Inv_NFIN * NPDIBL2R + Inv_LNFIN * PPDIBL2R;
+        PCLMR_i = PCLMR + Inv_L * LPCLMR + Inv_NFIN * NPCLMR + Inv_LNFIN * PPCLMR;
+        DVTSHIFTR_i = DVTSHIFTR + Inv_L * LDVTSHIFTR + Inv_NFIN * NDVTSHIFTR + Inv_LNFIN * PDVTSHIFTR;
+        VSATR_i = VSATR + Inv_L * LVSATR + Inv_NFIN * NVSATR + Inv_LNFIN * PVSATR;
+        KSATIVR_i = KSATIVR + Inv_L * LKSATIVR + Inv_NFIN * NKSATIVR + Inv_LNFIN * PKSATIVR;
+        U0R_i = U0R + Inv_L * LU0R + Inv_NFIN * NU0R + Inv_LNFIN * PU0R;
+        UAR_i = UAR + Inv_L * LUAR + Inv_NFIN * NUAR + Inv_LNFIN * PUAR;
+        UPR_i = UPR + Inv_L * LUPR + Inv_NFIN * NUPR + Inv_LNFIN * PUPR;
+        if (BULKMOD != 0) begin
+          UCR_i = UCR + Inv_L * LUCR + Inv_NFIN * NUCR + Inv_LNFIN * PUCR;
+        end
+        EUR_i = EUR + Inv_L * LEUR + Inv_NFIN * NEUR + Inv_LNFIN * PEUR;
+        UDR_i = UDR + Inv_L * LUDR + Inv_NFIN * NUDR + Inv_LNFIN * PUDR;
+      end
+      if (NQSMOD == 1) begin
+        $strobe(" Although the model selector NQSMOD is set to 1, the NQS gate resistance model is not activated in the Verilog-A code. Please uncomment \"`define __NQSMOD1__\" in bsimcmg.va to activate it.");
+      end
+      if (NQSMOD == 2) begin
+        $strobe(" Although the model selector NQSMOD is set to 2, the NQS gate resistance model is not activated in the Verilog-A code. Please uncomment \"`define __NQSMOD2__\" in bsimcmg.va to activate it.");
+      end
+      UTE_i = UTE + Inv_L * LUTE + Inv_NFIN * NUTE + Inv_LNFIN * PUTE;
+      UTL_i = UTL + Inv_L * LUTL + Inv_NFIN * NUTL + Inv_LNFIN * PUTL;
+      EMOBT_i = EMOBT + Inv_L * LEMOBT + Inv_NFIN * NEMOBT + Inv_LNFIN * PEMOBT;
+      UA1_i = UA1 + Inv_L * LUA1 + Inv_NFIN * NUA1 + Inv_LNFIN * PUA1;
+      if (BULKMOD != 0) begin
+        UC1_i = UC1 + Inv_L * LUC1 + Inv_NFIN * NUC1 + Inv_LNFIN * PUC1;
+      end
+      UD1_i = UD1 + Inv_L * LUD1 + Inv_NFIN * NUD1 + Inv_LNFIN * PUD1;
+      UCSTE_i = UCSTE + Inv_L * LUCSTE + Inv_NFIN * NUCSTE + Inv_LNFIN * PUCSTE;
+      PTWGT_i = PTWGT + Inv_L * LPTWGT + Inv_NFIN * NPTWGT + Inv_LNFIN * PPTWGT;
+      AT_i = AT + Inv_L * LAT + Inv_NFIN * NAT + Inv_LNFIN * PAT;
+      ATCV_i = ATCV + Inv_L * LATCV + Inv_NFIN * NATCV + Inv_LNFIN * PATCV;
+      PRT_i = PRT + Inv_L * LPRT + Inv_NFIN * NPRT + Inv_LNFIN * PPRT;
+      KT1_i = KT1 + Inv_L * LKT1 + Inv_NFIN * NKT1 + Inv_LNFIN * PKT1;
+      TSS_i = TSS + Inv_L * LTSS + Inv_NFIN * NTSS + Inv_LNFIN * PTSS;
+      IIT_i = IIT + Inv_L * LIIT + Inv_NFIN * NIIT + Inv_LNFIN * PIIT;
+      TGIDL_i = TGIDL + Inv_L * LTGIDL + Inv_NFIN * NTGIDL + Inv_LNFIN * PTGIDL;
+      IGT_i = IGT + Inv_L * LIGT + Inv_NFIN * NIGT + Inv_LNFIN * PIGT;
+      if (ASYMMOD != 0) begin
+        UTER_i = UTER + Inv_L * LUTER + Inv_NFIN * NUTER + Inv_LNFIN * PUTER;
+        UTLR_i = UTLR + Inv_L * LUTLR + Inv_NFIN * NUTLR + Inv_LNFIN * PUTLR;
+        UA1R_i = UA1R + Inv_L * LUA1R + Inv_NFIN * NUA1R + Inv_LNFIN * PUA1R;
+        UD1R_i = UD1R + Inv_L * LUD1R + Inv_NFIN * NUD1R + Inv_LNFIN * PUD1R;
+        ATR_i = ATR + Inv_L * LATR + Inv_NFIN * NATR + Inv_LNFIN * PATR;
+        if (BULKMOD != 0) begin
+          UC1R_i = UC1R + Inv_L * LUC1R + Inv_NFIN * NUC1R + Inv_LNFIN * PUC1R;
+        end
+      end
+      if (PHIGN1 != 0.0) begin
+        PHIG_i = PHIG_i * (1.0 + PHIGN1 / NFIN * lln(1.0 + NFIN / PHIGN2));
+      end
+      if (ETA0N1 != 0.0) begin
+        ETA0_i = ETA0_i * (1.0 + ETA0N1 / NFIN * lln(1.0 + NFIN / ETA0N2));
+      end
+      if (CDSCN1 != 0.0) begin
+        CDSC_i = CDSC_i * (1.0 + CDSCN1 / NFIN * lln(1.0 + NFIN / CDSCN2));
+      end
+      if (CDSCDN1 != 0.0) begin
+        CDSCD_i = CDSCD_i * (1.0 + CDSCDN1 / NFIN * lln(1.0 + NFIN / CDSCDN2));
+      end
+      if (CDSCDRN1 != 0.0) begin
+        CDSCDR_i = CDSCDR_i * (1.0 + CDSCDRN1 / NFIN * lln(1.0 + NFIN / CDSCDRN2));
+      end
+      if (VSATN1 != 0.0) begin
+        VSAT_i = VSAT_i * (1.0 + VSATN1 / NFIN * lln(1.0 + NFIN / VSATN2));
+      end
+      if (VSAT1N1 != 0.0) begin
+        VSAT1_i = VSAT1_i * (1.0 + VSAT1N1 / NFIN * lln(1.0 + NFIN / VSAT1N2));
+      end
+      if (VSAT1RN1 != 0.0) begin
+        VSAT1R_i = VSAT1R_i * (1.0 + VSAT1RN1 / NFIN * lln(1.0 + NFIN / VSAT1RN2));
+      end
+      if (U0N1 != 0.0) begin
+        U0_i = U0_i * (1.0 + U0N1 / NFIN * lln(1.0 + NFIN / U0N2));
+      end
+      if ($param_given(NFINNOM)) begin
+        PHIG_i = PHIG_i * (1.0 + (NFIN - NFINNOM) * PHIGLT * Leff);
+        ETA0_i = ETA0_i * (1.0 + (NFIN - NFINNOM) * ETA0LT * Leff);
+        U0_i = U0_i * (1.0 + (NFIN - NFINNOM) * U0LT * Leff);
+      end
+      if (U0N1R != 0.0) begin
+        U0R_i = U0R_i * (1.0 + U0N1R / NFIN * lln(1.0 + NFIN / U0N2R));
+      end
+      PHIG_i = PHIG_i + PHIGL * Leff;
+      if (LPA > 0.0) begin
+        U0_i = U0_i * (1.0 - UP_i * pow(Leff, -LPA));
+      end
+      else begin
+        U0_i = U0_i * (1.0 - UP_i);
+      end
+      UA_i = UA_i + AUA * lexp(-Leff / BUA);
+      UD_i = UD_i + AUD * lexp(-Leff / BUD);
+      EU_i = EU_i + AEU * lexp(-Leff / BEU);
+      if (ASYMMOD != 0) begin
+        if (LPAR > 0.0) begin
+          U0R_i = U0R_i * (1.0 - UPR_i * pow(Leff, -LPAR));
+        end
+        else begin
+          U0R_i = U0R_i * (1.0 - UPR_i);
+        end
+        UAR_i = UAR_i + AUAR * lexp(-Leff / BUAR);
+        UDR_i = UDR_i + AUDR * lexp(-Leff / BUDR);
+        EUR_i = EUR_i + AEUR * lexp(-Leff / BEUR);
+      end
+      if (RDSMOD == 1) begin
+        RSW_i = RSW_i + ARSW * lexp(-Leff / BRSW);
+        RDW_i = RDW_i + ARDW * lexp(-Leff / BRDW);
+      end
+      else begin
+        RDSW_i = RDSW_i + ARDSW * lexp(-Leff / BRDSW);
+      end
+      PCLM_i = PCLM_i + APCLM * lexp(-Leff / BPCLM);
+      if (ASYMMOD != 0) begin
+        PCLMR_i = PCLMR_i + APCLMR * pow(Leff, -BPCLMR);
+      end
+      MEXP_i = MEXP_i + AMEXP * pow(Leff, -BMEXP);
+      if (ASYMMOD != 0) begin
+        MEXPR_i = MEXPR_i + AMEXPR * pow(Leff, -BMEXPR);
+      end
+      PTWG_i = PTWG_i + APTWG * lexp(-Leff / BPTWG);
+      if (ASYMMOD != 0) begin
+        PTWGR_i = PTWGR_i + APTWG * lexp(-Leff / BPTWG);
+      end
+      VSAT_i = VSAT_i + AVSAT * lexp(-Leff / BVSAT);
+      VSAT1_i = VSAT1_i + AVSAT1 * lexp(-Leff / BVSAT1);
+      if (ASYMMOD != 0) begin
+        VSAT1R_i = VSAT1R_i + AVSAT1 * lexp(-Leff / BVSAT1);
+      end
+      PSAT_i = PSAT_i + APSAT * lexp(-Leff / BPSAT);
+      PSATCV_i = PSATCV_i + APSATCV * lexp(-Leff / BPSATCV);
+      VSATCV_i = VSATCV_i + AVSATCV * lexp(-LeffCV / BVSATCV);
+      DVTP0_i = DVTP0 + ADVTP0 * lexp(-Leff / BDVTP0);
+      DVTP1_i = DVTP1 + ADVTP1 * lexp(-Leff / BDVTP1);
+      if (QMTCENCV_i > 0.0 || QMTCENCVA_i > 0.0) begin
+        MTcen = 1.0 + AQMTCEN * lexp(-(2.0 * Ach / Weff_UFCM) / BQMTCEN);
+        Tcen0 = (2.0 * Ach / Weff_UFCM) * MTcen;
+      end
+      if (LeffCV <= 1.0e-9) begin
+        $strobe("Warning: LeffCV = %e <= 1.0e-9.", LeffCV);
+      end
+      if (BULKMOD != 0) begin
+        if (LeffCV_acc <= 1.0e-9) begin
+          $strobe("Warning: LeffCV_acc = %e <= 1.0e-9.", LeffCV_acc);
+        end
+      end
+      if (Weff0 <= 1.0e-9) begin
+        $strobe("Warning: Weff0 = %e <= 1.0e-9.", Weff0);
+      end
+      if (WeffCV0 <= 1.0e-9) begin
+        $strobe("Warning: WeffCV0 = %e <= 1.0e-9.", WeffCV0);
+      end
+      if (NBODY_i <= 0.0) begin
+        $strobe("Fatal: NBODY_i = %e is not positive.", NBODY_i);
+        $finish;
+      end
+      else
+        if (NBODY_i <= 1.0e18) begin
+          $strobe("Warning: NBODY_i = %e m^-3 may be too small.", NBODY_i);
+        end
+      if (NGATE_i < 0.0) begin
+        $strobe("Fatal: NGATE_i = %e is negative.", NGATE_i);
+        $finish;
+      end
+      else
+        if (NGATE_i != 0.0 && NGATE_i <= 1.0e24) begin
+          $strobe("Warning: NGATE_i = %e may be too small.", NGATE_i);
+        end
+        else
+          if (NGATE_i > 1.0e31) begin
+            $strobe("Fatal: NGATE_i = %e is too high.", NGATE_i);
+            $finish;
+          end
+      if (DVT0_i < 0.0) begin
+        $strobe("Warning: DVT0_i = %e is negative.", DVT0_i);
+      end
+      if (PHIG_i <= 0.0) begin
+        $strobe("Fatal: PHIG_i = %e is not positive.", PHIG_i);
+        $finish;
+      end
+      if (VSAT_i <= 0.0) begin
+        $strobe("Fatal: VSAT_i = %e is not positive.", VSAT_i);
+        $finish;
+      end
+      if (VSAT1_i <= 0.0) begin
+        $strobe("Fatal: VSAT1_i = %e is not positive.", VSAT1_i);
+        $finish;
+      end
+      if (ASYMMOD != 0 && VSAT1R_i <= 0.0) begin
+        $strobe("Fatal: VSAT1R_i = %e is not positive.", VSAT1R_i);
+        $finish;
+      end
+      if (DVT1_i <= 0.0) begin
+        $strobe("Fatal: DVT1_i = %e is not positive.", DVT1_i);
+        $finish;
+      end
+      if (DVT1SS_i <= 0.0) begin
+        $strobe("Fatal: DVT1SS_i = %e is not positive.", DVT1SS_i);
+        $finish;
+      end
+      if (CDSC_i < 0.0) begin
+        $strobe("Warning: CDSC_i = %e is negative.", CDSC_i);
+      end
+      if (CDSCD_i < 0.0) begin
+        $strobe("Warning: CDSCD_i = %e is negative.", CDSCD_i);
+      end
+      if (ASYMMOD != 0 && CDSCDR_i < 0.0) begin
+        $strobe("Warning: CDSCDR_i = %e is negative.", CDSCDR_i);
+      end
+      if (DSUB_i <= 0.0) begin
+        $strobe("Fatal: DSUB_i = %e is not positive.", DSUB_i);
+        $finish;
+      end
+      if (ETA0_i < 0.0) begin
+        $strobe("Warning: ETA0_i = %e is negative, setting it to 0", ETA0_i);
+        ETA0_i = 0.0;
+      end
+      if (ETA0R_i < 0.0) begin
+        $strobe("Warning: ETA0R_i = %e is negative, setting it to 0", ETA0R_i);
+        ETA0R_i = 0.0;
+      end
+      if (LPE0_i < -Leff) begin
+        $strobe("Warning: LPE0_i = %e is less than -Leff. Clipping LPE0_i to 0", LPE0_i);
+        LPE0_i = 0.0;
+      end
+      if (K0SI_i <= 0.0) begin
+        $strobe("Warning: K0SI_i = %e is not positive, setting it to 0.", K0SI_i);
+        K0SI_i = 0.0;
+      end
+      if (K2SI_i <= 0.0) begin
+        $strobe("Warning: K2SI_i = %e is not positive, setting it to 0.", K2SI_i);
+        K2SI_i = 0.0;
+      end
+      if (PHIBE_i < 0.2 && BULKMOD != 0) begin
+        $strobe("Warning: PHIBE_i = %e is less than 0.2, setting it to 0.2.", PHIBE_i);
+        PHIBE_i = 0.2;
+      end
+      if (PHIBE_i > 1.2 && BULKMOD != 0) begin
+        $strobe("Warning: PHIBE_i = %e is larger than 1.2, setting it to 1.2.", PHIBE_i);
+        PHIBE_i = 1.2;
+      end
+      if (PSAT_i < 2.0) begin
+        $strobe("Warning: PSAT_i = %e is less than 2.0, setting it to 2.0.", PSAT_i);
+        PSAT_i = 2.0;
+      end
+      if (PSATCV_i < 2.0) begin
+        $strobe("Warning: PSATCV_i = %e is less than 2.0, setting it to 2.0.", PSATCV_i);
+        PSATCV_i = 2.0;
+      end
+      if (U0_i < 0.0) begin
+        $strobe("Warning: U0_i = %e is negative, setting it to the default value.", U0_i);
+        U0_i = 0.03;
+      end
+      if (UA_i < 0.0) begin
+        $strobe("Warning: UA_i = %e is negative, setting it to 0.", UA_i);
+        UA_i = 0.0;
+      end
+      if (EU_i < 0.0) begin
+        $strobe("Warning: EU_i = %e is negative, setting it to 0.", EU_i);
+        EU_i = 0.0;
+      end
+      if (UD_i < 0.0) begin
+        $strobe("Warning: UD_i = %e is negative, setting it to 0.", UD_i);
+        UD_i = 0.0;
+      end
+      if (UCS_i < 0.0) begin
+        $strobe("Warning: UCS_i = %e is negative, setting it to 0.", UCS_i);
+        UCS_i = 0.0;
+      end
+      if (ETAMOB_i < 0.0) begin
+        $strobe("Warning: ETAMOB_i = %e is negative, setting it to 0", ETAMOB_i);
+        ETAMOB_i = 0.0;
+      end
+      RDSWMIN_i = RDSWMIN;
+      if (RDSWMIN_i < 0.0) begin
+        $strobe("Warning: RDSWMIN = %e is negative.  Set to zero", RDSWMIN_i);
+        RDSWMIN_i = 0.0;
+      end
+      if (RDSW_i < 0.0) begin
+        $strobe("Warning: RDSW_i = %e is negative.  Set to zero", RDSW_i);
+        RDSW_i = 0.0;
+      end
+      RSWMIN_i = RSWMIN;
+      if (RSWMIN_i < 0.0) begin
+        $strobe("Warning: RSWMIN = %e is negative.  Set to zero", RSWMIN_i);
+        RSWMIN_i = 0.0;
+      end
+      if (RSW_i < 0.0) begin
+        $strobe("Warning: RSW_i = %e is negative.  Set to zero", RSW_i);
+        RSW_i = 0.0;
+      end
+      RDWMIN_i = RDWMIN;
+      if (RDWMIN_i < 0.0) begin
+        $strobe("Warning: RDWMIN = %e is negative.  Set to zero", RDWMIN_i);
+        RDWMIN_i = 0.0;
+      end
+      if (RDW_i < 0) begin
+        $strobe("Warning: RDW_i = %e is negative.  Set to zero", RDW_i);
+        RDW_i = 0.0;
+      end
+      if (PRWGD_i < 0.0) begin
+        $strobe("Warning: PRWGD_i = %e is negative.  Set to zero", PRWGD_i);
+        PRWGD_i = 0.0;
+      end
+      if (PRWGS_i < 0.0) begin
+        $strobe("Warning: PRWGS_i = %e is negative.  Set to zero", PRWGS_i);
+        PRWGS_i = 0.0;
+      end
+      if (PCLM_i < 0) begin
+        $strobe("Warning: PCLM_i = %e is negative.", PCLM_i);
+      end
+      if (PDIBL1_i < 0.0) begin
+        $strobe("Warning: PDIBL1_i = %e is negative.", PDIBL1_i);
+      end
+      if (ASYMMOD != 0) begin
+        if (PDIBL1R_i < 0.0) begin
+          $strobe("Warning: PDIBL1R_i = %e is negative.", PDIBL1R_i);
+        end
+        if (PDIBL2R_i < 0.0) begin
+          $strobe("Warning: PDIBL2R_i = %e is negative.", PDIBL2R_i);
+        end
+        if (U0R_i < 0) begin
+          $strobe("Warning: U0R_i = %e is negative, setting it to 0.", U0R_i);
+          U0R_i = 0.0;
+        end
+        if (UAR_i < 0.0) begin
+          $strobe("Warning: UAR_i = %e is negative, setting it to 0.", UAR_i);
+          UAR_i = 0.0;
+        end
+        if (EUR_i < 0.0) begin
+          $strobe("Warning: EUR_i = %e is negative, setting it to 0.", EUR_i);
+          EUR_i = 0.0;
+        end
+        if (UDR_i < 0.0) begin
+          $strobe("Warning: UDR_i = %e is negative, setting it to 0.", UDR_i);
+          UDR_i = 0.0;
+        end
+      end
+      if (PDIBL2_i < 0.0) begin
+        $strobe("Warning: PDIBL2_i = %e is negative.", PDIBL2_i);
+      end
+      if (DROUT_i <= 0.0) begin
+        $strobe("Fatal: DROUT_i = %e is non-positive.", DROUT_i);
+        $finish;
+      end
+      if (MEXP_i < 2.0) begin
+        $strobe("Warning: MEXP_i = %e < 2. Setting MEXP_i = 2.", MEXP_i);
+        MEXP_i = 2.0;
+      end
+      if (ASYMMOD != 0) begin
+        if (MEXPR_i < 2.0) begin
+          $strobe("Warning: MEXPR_i = %e < 2.  Setting MEXPR_i = 2.", MEXPR_i);
+          MEXPR_i = 2.0;
+        end
+      end
+      if (PTWG_i < 0) begin
+        $strobe("Warning: PTWG_i = %e is negative, setting it to 0.", PTWG_i);
+        PTWG_i = 0.0;
+      end
+      if (QMTCENCV_i > 0.0) begin
+        if (QM0 <= 0.0) begin
+          $strobe("Fatal: QM0 = %e is non-positive.", QM0);
+          $finish;
+        end
+      end
+      if (BULKMOD != 0 && QMTCENCVA_i > 0.0) begin
+        if (QM0ACC <= 0.0) begin
+          $strobe("Fatal: QM0ACC = %e is non-positive.", QM0ACC);
+          $finish;
+        end
+      end
+      if (CGIDL_i < 0.0) begin
+        $strobe("Warning: CGIDL_i = %e < 0.  Setting CGIDL_i = 0.", CGIDL_i);
+        CGIDL_i = 0.0;
+      end
+      if (CGISL_i < 0.0) begin
+        $strobe("Warning: CGISL_i = %e < 0.  Setting CGISL_i = 0.", CGISL_i);
+        CGISL_i = 0.0;
+      end
+      if (IGBMOD != 0) begin
+        if (NIGBINV_i <= 0.0) begin
+          $strobe("Fatal: NIGBINV_i = %e is non-positive.", NIGBINV_i);
+          $finish;
+        end
+        if (NIGBACC_i <= 0.0) begin
+          $strobe("Fatal: NIGBACC_i = %e is non-positive.", NIGBACC_i);
+          $finish;
+        end
+      end
+      if (IGCMOD != 0) begin
+        if (POXEDGE_i <= 0.0) begin
+          $strobe("Fatal: POXEDGE_i = %e is non-positive.", POXEDGE_i);
+          $finish;
+        end
+        if (PIGCD_i <= 0.0) begin
+          $strobe("Fatal: PIGCD_i = %e is non-positive.", PIGCD_i);
+          $finish;
+        end
+      end
+      if (IGCMOD != 0 || IGBMOD != 0) begin
+        if (TOXREF <= 0) begin
+          $strobe("Fatal: TOXREF = %e is non-positive.", TOXREF);
+          $finish;
+        end
+      end
+      if (LINTIGEN >= (Leff / 2.0)) begin
+        $strobe("Warning: LINTIGEN = %e is too large - Leff for r/g current is negative.  Re-setting LINTIGEN = 0.", LINTIGEN);
+        LINTIGEN_i = 0.0;
+      end
+      else begin
+        LINTIGEN_i = LINTIGEN;
+      end
+      if (NTGEN_i <= 0.0) begin
+        $strobe("Fatal: NTGEN_i = %e is non-positive.", NTGEN_i);
+        $finish;
+      end
+      if (IIMOD == 2) begin
+        if (BETAII0_i < 0.0) begin
+          $strobe("Warning:  BETAII0_i = %e is negative.", BETAII0_i);
+        end
+        if (BETAII1_i < 0.0) begin
+          $strobe("Warning:  BETAII1_i = %e is negative.", BETAII1_i);
+        end
+        if (BETAII2_i < 0.0) begin
+          $strobe("Warning:  BETAII2_i = %e is negative.", BETAII2_i);
+        end
+        if (ESATII_i < 0.0) begin
+          $strobe("Warning:  ESATII_i = %e is negative.", ESATII_i);
+        end
+        if (LII_i < 0.0) begin
+          $strobe("Warning:  LII_i = %e is negative.", LII_i);
+        end
+        if (SII1_i < 0.0) begin
+          $strobe("Warning:  SII1_i = %e is negative.", SII1);
+        end
+        if (SII2_i < 0.0) begin
+          $strobe("Warning:  SII2_i = %e is negative.", SII2_i);
+        end
+        if (SIID_i < 0.0) begin
+          $strobe("Warning:  SIID_i = %e is negative.", SIID_i);
+        end
+      end
+      if (EF <= 0.0) begin
+        $strobe("Fatal: EF = %e is non-positive.", EF);
+        $finish;
+      end
+      else
+        if (EF > 2.0) begin
+          $strobe("Fatal: EF = %e > 2.0.", EF);
+          $finish;
+        end
+      if (LINTNOI >= (Leff / 2.0)) begin
+        $strobe("Warning: LINTNOI = %e is too large - Leff for noise is negative.  Re-setting LINTNOI = 0.", LINTNOI);
+        LINTNOI_i = 0.0;
+      end
+      else begin
+        LINTNOI_i = LINTNOI;
+      end
+      if (NTNOI < 0) begin
+        $strobe("Warning: NTNOI = %e is negative. Set to zero.", NTNOI);
+        NTNOI_i = 0.0;
+      end
+      else begin
+        NTNOI_i = NTNOI;
+      end
+      if (SHMOD != 0 && RTH0 > 0.0) begin
+        T1 = WTH0;
+        if (BSHEXP != 0.0) begin
+          T1 = WTH0 * pow(NF, BSHEXP);
+        end
+        T2 = FPITCH;
+        if (ASHEXP != 0.0) begin
+          T2 = FPITCH * pow(NFINtotal, ASHEXP);
+        end
+        gth = (T1 + T2) / RTH0;
+        cth = CTH0 * (T1 + T2);
+      end
+      else begin
+        gth = 1.0;
+        cth = 0.0;
+      end
+      if (RGATEMOD != 0) begin
+        Rgeltd = (RGEXT / NGCON + (RGFIN * NFIN) / ((NGCON == 2) ? (12.0) : (3.0))) / NF;
+        ggeltd = 1.0 / max(1.0e-3, Rgeltd);
+      end
+      if (RGEOMOD == 0) begin
+        RSourceGeo = RSHS * NRS;
+        RDrainGeo = RSHD * NRD;
+      end
+      else begin
+        if (HEPI > 0.0) begin
+          Arsd = FPITCH * HFIN + (TFIN + (FPITCH - TFIN) * CRATIO) * HEPI;
+        end
+        else begin
+          Arsd = FPITCH * max(1.0e-9, HFIN + HEPI);
+        end
+        Prsd = FPITCH + DELTAPRSD;
+        if ($param_given(RHORSD)) begin
+          rhorsd = RHORSD;
+        end
+        else begin
+          mu_max = ((TYPE == 1)) ? (1417.0) : (470.5);
+          if (TYPE == 1) begin
+            mu_rsd = (52.2 + (mu_max - 52.2) / (1.0 + pow(NSD / 9.68e22, 0.680)) - 43.4 / (1.0 + pow(3.43e26 / NSD, 2.0))) * 1.0e-4;
+          end
+          else begin
+            mu_rsd = (44.9 + (mu_max - 44.9) / (1.0 + pow(NSD / 2.23e22, 0.719)) - 29.0 / (1.0 + pow(6.10e26 / NSD, 2.0))) * 1.0e-4;
+          end
+          rhorsd = 1.0 / (1.60219e-19 * NSD * mu_rsd);
+        end
+        thetarsp = 55.0 * 3.14159265358979323846 / 180.0;
+        afin = min(Arsd, max(1.0e-18, TFIN * (HFIN + min(0.0, HEPI))));
+        T1 = ((thetarsp >= 3.14159265358979323846 / 2) ? (0) : (((thetarsp <= -3.14159265358979323846 / 2) ? (0) : (1.0 / tan(thetarsp)))));
+        Rsp = rhorsd * T1 / (sqrt(3.14159265358979323846) * NFIN) * (1.0 / sqrt(afin) - 2.0 / sqrt(Arsd) + sqrt(afin / (Arsd * Arsd)));
+        arsd_total = Arsd * NFIN + ARSDEND;
+        prsd_total = Prsd * NFIN + PRSDEND;
+        lt = sqrt(RHOC * arsd_total / (rhorsd * prsd_total));
+        alpha = LRSD / lt;
+        T0 = lexp(alpha + alpha);
+        if (SDTERM == 1.0) begin
+          eta = rhorsd * lt / RHOC;
+          T1 = T0 * (1.0 + eta);
+          T2 = T1 + 1.0 - eta;
+          T3 = T1 - 1.0 + eta;
+        end
+        else begin
+          T2 = T0 + 1.0;
+          T3 = T0 - 1.0;
+        end
+        RrsdTML = rhorsd * lt * T2 / (arsd_total * T3);
+        if (HEPI < -1.0e-10) begin
+          Rrsdside = RHOC / (-HEPI * TFIN * NFIN);
+          Rrsd = (RrsdTML + Rsp) * Rrsdside / ((RrsdTML + Rsp) + Rrsdside);
+        end
+        else begin
+          Rrsd = RrsdTML + Rsp;
+        end
+        Rdsgeo = Rrsd / NF * max(0.0, RGEOA + RGEOB * TFIN + RGEOC * FPITCH + RGEOD * LRSD + RGEOE * HEPI);
+        RSourceGeo = Rdsgeo;
+        RDrainGeo = Rdsgeo;
+      end
+      if (RSourceGeo <= 1.0e-3) begin
+        RSourceGeo = 1.0e-3;
+      end
+      if (RDrainGeo <= 1.0e-3) begin
+        RDrainGeo = 1.0e-3;
+      end
+      if (RDSMOD == 1) begin
+        if (RSWMIN_i <= 0.0) begin
+          RSWMIN_i = 0.0;
+        end
+        if (RDWMIN_i <= 0.0) begin
+          RDWMIN_i = 0.0;
+        end
+        if (RSW_i <= 0.0) begin
+          RSW_i = 0.0;
+        end
+        if (RDW_i <= 0.0) begin
+          RDW_i = 0.0;
+        end
+      end
+      else begin
+        if (RDSWMIN_i <= 0.0) begin
+          RDSWMIN_i = 0.0;
+        end
+        if (RDSW_i <= 0.0) begin
+          RDSW_i = 0.0;
+        end
+      end
+      if (CGEOMOD != 1) begin
+        if ($param_given(CGSO)) begin
+          CGSO_i = CGSO;
+        end
+        else begin
+          if ($param_given(DLC) && DLC > 0.0) begin
+            CGSO_i = max(0.0, DLC * cox - CGSL_i);
+          end
+          else begin
+            CGSO_i = 0.3 * TFIN * cox;
+          end
+        end
+        if ($param_given(CGDO)) begin
+          CGDO_i = CGDO;
+        end
+        else begin
+          if ($param_given(DLC) && DLC > 0.0) begin
+            CGDO_i = max(0.0, DLC * cox - CGDL_i);
+          end
+          else begin
+            CGDO_i = 0.3 * TFIN * cox;
+          end
+        end
+      end
+      if (CGEOMOD == 2) begin
+        Hg = TGATE + TMASK;
+        Trsd = 0.5 * (FPITCH - TFIN);
+        Wg = max(0.0, Trsd - TOXP);
+        Hrsd = max(0.0, HEPI + TSILI);
+        if (TMASK > 0.0) begin
+          T0 = 3.467e-11 * lln(1.0e-7 * EPSRSP / (3.9 * LSP));
+          T1 = 0.942 * Hrsd * epssp / LSP;
+          Cgg_top = (T0 + T1) * (TFIN + (FPITCH - TFIN) * CRATIO);
+        end
+        else begin
+          begin : cfr_top_trigate
+            real Hr;
+            real Lr;
+            real Hgdelta;
+            real Lmax;
+            real y;
+            real x;
+            real CcgSat;
+            real Cnon;
+            real TT1;
+            real Ccg1;
+            real r1cf;
+            real Rcf;
+            real Ccg2;
+            real Ccg;
+            real C1;
+            real C2;
+            real C3;
+            real Cfglog;
+            real dcf;
+            real TT0;
+            real TT2;
+            real Cfgsat;
+            real delta;
+            real Cfg;
+
+            Hr = 2.3 + 0.2 * (Hg + TOXP) / Hrsd;
+            Lr = 1.05;
+            Hgdelta = abs(Hg + TOXP - Hrsd);
+            Lmax = LSP * Lr;
+            y = min(Hrsd, Hg + TOXP);
+            x = LSP / (Hr + 1.0);
+            Cnon = 1.7e12;
+            CcgSat = epssp * (y - x) / LSP;
+            TT1 = Cnon * CcgSat;
+            if (TT1 > 80.0)
+              Ccg1 = CcgSat;
+            else
+              Ccg1 = 1.0 / Cnon * ln(1.0 + lexp(TT1));
+            r1cf = 0.5 * min(Hrsd / (Hg + TOXP), (Hg + TOXP) / Hrsd);
+            Rcf = Hgdelta * r1cf;
+            Ccg2 = epssp * 2 / 3.14159265358979323846 * ln((LSP + 0.5 * 3.14159265358979323846 * Rcf) / LSP);
+            Ccg = TFIN * (Ccg1 + Ccg2);
+            x = Lmax / Hg;
+            C1 = 4.0 / (sqrt(2.0 * (x + 1)) * 3.14159265358979323846);
+            C2 = sqrt(TOXP * TOXP + 2.0 * Hg * TOXP + Hg * Hg * (x + 1)) * sqrt(x + 1) + TOXP + Hg * x + Hg;
+            C3 = TOXP * sqrt((x + 1) * (x + 4)) + TOXP * (x + 2);
+            Cfglog = epssp * (C1 * ln(C2 / C3) + 12.27);
+            dcf = Hr * Lr;
+            TT0 = sqrt(dcf * dcf + 1.0);
+            TT1 = sqrt((dcf * dcf + 1) * ((dcf * TOXP) * (dcf * TOXP) + 2 * dcf * Lmax * TOXP + (dcf * dcf + 1) * Lmax * Lmax)) + dcf * TOXP + dcf * dcf * Lmax + Lmax;
+            TT2 = (TT0 + 1.0) * (dcf * TOXP);
+            Cfgsat = 2.0 * epssp * sqrt(2) / 3.14159265358979323846 * 0.85 * dcf / TT0 * ln(TT1 / TT2);
+            delta = 1.2e-12;
+            TT1 = Cfgsat - Cfglog - delta;
+            Cfg = TFIN * (Cfgsat - 0.5 * (TT1 + sqrt(TT1 * TT1 + 4 * delta * Cfgsat)));
+            Cgg_top = Ccg + Cfg;
+          end
+        end
+        if (TMASK > 0) begin
+          begin : cfr_side_dblgate
+            real Hr;
+            real Lr;
+            real Hgdelta;
+            real Lmax;
+            real y;
+            real x;
+            real CcgSat;
+            real Cnon;
+            real TT1;
+            real Ccg1;
+            real r1cf;
+            real Rcf;
+            real Ccg2;
+            real Ccg;
+            real C1;
+            real C2;
+            real C3;
+            real Cfglog;
+            real dcf;
+            real TT0;
+            real TT2;
+            real Cfgsat;
+            real delta;
+            real Cfg;
+
+            Hr = 2.3 + 0.2 * (Wg + TOXP) / Trsd;
+            Lr = 1.05;
+            Hgdelta = abs(Wg + TOXP - Trsd);
+            Lmax = LSP * Lr;
+            y = min(Trsd, Wg + TOXP);
+            x = LSP / (Hr + 1.0);
+            Cnon = 1.7e12;
+            CcgSat = epssp * (y - x) / LSP;
+            TT1 = Cnon * CcgSat;
+            if (TT1 > 80.0)
+              Ccg1 = CcgSat;
+            else
+              Ccg1 = 1.0 / Cnon * ln(1.0 + lexp(TT1));
+            r1cf = 0.5 * min(Trsd / (Wg + TOXP), (Wg + TOXP) / Trsd);
+            Rcf = Hgdelta * r1cf;
+            Ccg2 = epssp * 2 / 3.14159265358979323846 * ln((LSP + 0.5 * 3.14159265358979323846 * Rcf) / LSP);
+            Ccg = HFIN * (Ccg1 + Ccg2);
+            x = Lmax / Wg;
+            C1 = 4.0 / (sqrt(2.0 * (x + 1)) * 3.14159265358979323846);
+            C2 = sqrt(TOXP * TOXP + 2.0 * Wg * TOXP + Wg * Wg * (x + 1)) * sqrt(x + 1) + TOXP + Wg * x + Wg;
+            C3 = TOXP * sqrt((x + 1) * (x + 4)) + TOXP * (x + 2);
+            Cfglog = epssp * (C1 * ln(C2 / C3) + 12.27);
+            dcf = Hr * Lr;
+            TT0 = sqrt(dcf * dcf + 1.0);
+            TT1 = sqrt((dcf * dcf + 1) * ((dcf * TOXP) * (dcf * TOXP) + 2 * dcf * Lmax * TOXP + (dcf * dcf + 1) * Lmax * Lmax)) + dcf * TOXP + dcf * dcf * Lmax + Lmax;
+            TT2 = (TT0 + 1.0) * (dcf * TOXP);
+            Cfgsat = 2.0 * epssp * sqrt(2) / 3.14159265358979323846 * 0.70 * dcf / TT0 * ln(TT1 / TT2);
+            delta = 1.2e-12;
+            TT1 = Cfgsat - Cfglog - delta;
+            Cfg = HFIN * (Cfgsat - 0.5 * (TT1 + sqrt(TT1 * TT1 + 4 * delta * Cfgsat)));
+            Cgg_side = Ccg + Cfg;
+          end
+        end
+        else begin
+          begin : cfr_side_trigate
+            real Hr;
+            real Lr;
+            real Hgdelta;
+            real Lmax;
+            real y;
+            real x;
+            real CcgSat;
+            real Cnon;
+            real TT1;
+            real Ccg1;
+            real r1cf;
+            real Rcf;
+            real Ccg2;
+            real Ccg;
+            real C1;
+            real C2;
+            real C3;
+            real Cfglog;
+            real dcf;
+            real TT0;
+            real TT2;
+            real Cfgsat;
+            real delta;
+            real Cfg;
+
+            Hr = 2.3 + 0.2 * (Wg + TOXP) / Trsd;
+            Lr = 1.05;
+            Hgdelta = abs(Wg + TOXP - Trsd);
+            Lmax = LSP * Lr;
+            y = min(Trsd, Wg + TOXP);
+            x = LSP / (Hr + 1.0);
+            Cnon = 1.7e12;
+            CcgSat = epssp * (y - x) / LSP;
+            TT1 = Cnon * CcgSat;
+            if (TT1 > 80.0)
+              Ccg1 = CcgSat;
+            else
+              Ccg1 = 1.0 / Cnon * ln(1.0 + lexp(TT1));
+            r1cf = 0.5 * min(Trsd / (Wg + TOXP), (Wg + TOXP) / Trsd);
+            Rcf = Hgdelta * r1cf;
+            Ccg2 = epssp * 2 / 3.14159265358979323846 * ln((LSP + 0.5 * 3.14159265358979323846 * Rcf) / LSP);
+            Ccg = HFIN * (Ccg1 + Ccg2);
+            x = Lmax / Wg;
+            C1 = 4.0 / (sqrt(2.0 * (x + 1)) * 3.14159265358979323846);
+            C2 = sqrt(TOXP * TOXP + 2.0 * Wg * TOXP + Wg * Wg * (x + 1)) * sqrt(x + 1) + TOXP + Wg * x + Wg;
+            C3 = TOXP * sqrt((x + 1) * (x + 4)) + TOXP * (x + 2);
+            Cfglog = epssp * (C1 * ln(C2 / C3) + 12.27);
+            dcf = Hr * Lr;
+            TT0 = sqrt(dcf * dcf + 1.0);
+            TT1 = sqrt((dcf * dcf + 1) * ((dcf * TOXP) * (dcf * TOXP) + 2 * dcf * Lmax * TOXP + (dcf * dcf + 1) * Lmax * Lmax)) + dcf * TOXP + dcf * dcf * Lmax + Lmax;
+            TT2 = (TT0 + 1.0) * (dcf * TOXP);
+            Cfgsat = 2.0 * epssp * sqrt(2) / 3.14159265358979323846 * 0.85 * dcf / TT0 * ln(TT1 / TT2);
+            delta = 1.2e-12;
+            TT1 = Cfgsat - Cfglog - delta;
+            Cfg = HFIN * (Cfgsat - 0.5 * (TT1 + sqrt(TT1 * TT1 + 4 * delta * Cfgsat)));
+            Cgg_side = Ccg + Cfg;
+          end
+        end
+        if (TMASK > 0.0) begin
+          Acorner = 0.0;
+        end
+        else begin
+          if (HEPI > 0.0) begin
+            Acorner = (FPITCH - TFIN) * (HEPI * CRATIO + TSILI);
+          end
+          else begin
+            Acorner = (FPITCH - TFIN) * Hrsd;
+          end
+        end
+        Ccorner = (NFIN * Acorner + ARSDEND + ASILIEND) * epssp / LSP;
+        Cfr_geo = (Ccorner + Cgg_top * NFIN + CGEOE * Cgg_side * NFIN * 2.0) * NF;
+        Cfr_geo = Cfr_geo * max(0.0, CGEOA + CGEOB * TFIN + CGEOC * FPITCH + CGEOD * LRSD);
+      end
+      T0 = CSDESW * lln(1.0 + HFIN / EOTBOX);
+      csbox = cbox * ASEO + T0 * max(0.0, PSEO - FPITCH * NFINtotal);
+      cdbox = cbox * ADEO + T0 * max(0.0, PDEO - FPITCH * NFINtotal);
+      cgbox = (CGBO * NF * NGCON + CGBN * NFINtotal) * Lg;
+      EeffFactor = 1.0e-8 / (epsratio * EOT);
+      WeffWRFactor = 1.0 / (pow(Weff0 * 1.0e6, WR_i) * NFINtotal);
+      litl = sqrt(epsratio * EOT * 0.5 * TFIN);
+      if (!$param_given(THETASCE)) begin
+        tmp = DVT1_i * Leff / scl + 1.0e-6;
+        if (tmp < 40.0) begin
+          Theta_SCE = 0.5 / (cosh(tmp) - 1.0);
+        end
+        else begin
+          Theta_SCE = exp(-tmp);
+        end
+      end
+      else begin
+        Theta_SCE = THETASCE;
+      end
+      if (!$param_given(THETASW)) begin
+        tmp = DVT1SS_i * Leff / scl + 1.0e-6;
+        if (tmp < 40.0) begin
+          Theta_SW = 0.5 / (cosh(tmp) - 1.0);
+        end
+        else begin
+          Theta_SW = exp(-tmp);
+        end
+      end
+      else begin
+        Theta_SW = THETASW;
+      end
+      if (!$param_given(THETADIBL)) begin
+        tmp = DSUB_i * Leff / scl + 1.0e-6;
+        if (tmp < 40.0) begin
+          Theta_DIBL = 0.5 / (cosh(tmp) - 1.0);
+        end
+        else begin
+          Theta_DIBL = exp(-tmp);
+        end
+      end
+      else begin
+        Theta_DIBL = THETADIBL;
+      end
+      Theta_RSCE = sqrt(1.0 + LPE0_i / Leff) - 1.0;
+      tmp = DSUB_i * Leff / scl + 1.0e-6;
+      if (tmp < 40.0) begin
+        T0 = 1.0 / max((1.0 + DVTP2 * (cosh(tmp) - 2.0)), 1.0e-6);
+      end
+      else begin
+        T0 = exp(-tmp) / max((exp(-tmp) + DVTP2), 1.0e-6);
+      end
+      Theta_DITS = T0;
+      nbody = NBODY_i;
+      qbs = 1.60219e-19 * nbody * Ach / Cins;
+      if (TYPE == 1) begin
+        Aechvb = 4.97232e-7;
+        Bechvb = 7.45669e11;
+      end
+      else begin
+        Aechvb = 3.42537e-7;
+        Bechvb = 1.16645e12;
+      end
+      T0 = TOXG * TOXG;
+      T1 = TOXG * POXEDGE_i;
+      T2 = T1 * T1;
+      Toxratio = lexp(NTOX_i * lln(TOXREF / TOXG)) / T0;
+      Toxratioedge = lexp(NTOX_i * lln(TOXREF / T1)) / T2;
+      igsd_mult0 = Weff0 * Aechvb * Toxratioedge;
+      if (TNOM < -273.15) begin
+        $strobe("Warning: (TNOM=%e) < -`P_CELSIUS0. Set to 27 C.", TNOM);
+        Tnom = 300.15;
+      end
+      else begin
+        Tnom = TNOM + 273.15;
+      end
+    end
+    if (SHMOD != 0 && RTH0 > 0.0) begin
+      DevTemp = $temperature + Temp(t) + DTEMP;
+    end
+    else begin
+      DevTemp = $temperature + DTEMP;
+    end
+    begin : CMGTempDepCalc
+      TRatio = DevTemp / Tnom;
+      delTemp = DevTemp - Tnom;
+      Vtm = 8.617087e-5 * DevTemp;
+      Vtm0 = 8.617087e-5 * Tnom;
+      Eg = BG0SUB - TBGASUB * DevTemp * DevTemp / (DevTemp + TBGBSUB);
+      Eg0 = BG0SUB - TBGASUB * Tnom * Tnom / (Tnom + TBGBSUB);
+      T1 = (DevTemp / 300.15) * sqrt(DevTemp / 300.15);
+      ni = NI0SUB * T1 * lexp(BG0SUB / (2.0 * 8.617087e-5 * 300.15) - Eg / (2.0 * Vtm));
+      Nc = NC0SUB * T1;
+      ThetaSS = hypsmooth(1.0 + TSS_i * delTemp - 1.0e-6, 1.0e-3);
+      kT = Vtm * 1.60219e-19;
+      T0 = 1.05457e-34 * 3.14159265358979323846 / (2 * Ach / Weff_UFCM);
+      E0 = T0 * T0 / (2.0 * mx);
+      E0prime = T0 * T0 / (2.0 * mxprime);
+      E1 = 4.0 * E0;
+      E1prime = 4.0 * E0prime;
+      T1 = gprime * mdprime / (gfactor * md);
+      gam0 = 1.0 + T1 * lexp((E0 - E0prime) / kT);
+      gam1 = gam0 + lexp((E0 - E1) / kT) + T1 * lexp((E0 - E1prime) / kT);
+      T2 = -Vtm * lln(gfactor * md / (3.14159265358979323846 * 1.05457e-34 * 1.05457e-34 * Nc) * kT / (2.0 * Ach / Weff_UFCM) * gam1);
+      dvch_qm = QMFACTOR_i * (E0 / 1.60219e-19 + T2);
+      ETA0_t = Tempdep(ETA0_i, TETA0, delTemp, TEMPMOD);
+      ETA0R_t = Tempdep(ETA0R_i, TETA0R, delTemp, TEMPMOD);
+      T1 = U0_i * pow(TRatio, UTE_i);
+      U0_t = T1 + hypmax(UTL_i * delTemp, -0.9 * T1, 1.0e-4);
+      u0 = U0_t;
+      if (ASYMMOD == 1) begin
+        T1 = U0R_i * pow(TRatio, UTER_i);
+        U0R_t = T1 + hypmax(UTLR_i * delTemp, -0.9 * T1, 1.0e-4);
+        u0r = U0R_t;
+      end
+      ETAMOB_t = Tempdep(ETAMOB_i, EMOBT_i, delTemp, TEMPMOD);
+      UA_t = UA_i + hypmax(UA1_i * delTemp, -UA_i, 1.0e-6);
+      if (ASYMMOD != 0) begin
+        UAR_t = UAR_i + hypmax(UA1R_i * delTemp, -UAR_i, 1.0e-6);
+      end
+      if (BULKMOD != 0) begin
+        if (TEMPMOD == 0) begin
+          UC_t = Tempdep(UC_i, UC1_i, delTemp, 0);
+          if (ASYMMOD != 0) begin
+            UCR_t = Tempdep(UCR_i, UC1R_i, delTemp, 0);
+          end
+        end
+        else begin
+          UC_t = UC_i + UC1_i * delTemp;
+          if (ASYMMOD != 0) begin
+            UCR_t = UCR_i + UC1R_i * delTemp;
+          end
+        end
+      end
+      UD_t = UD_i * pow(TRatio, UD1_i);
+      if (ASYMMOD != 0) begin
+        UDR_t = UDR_i * pow(TRatio, UD1R_i);
+      end
+      UCS_t = UCS_i * pow(TRatio, UCSTE_i);
+      rdstemp = hypsmooth(1.0 + PRT_i * delTemp - 1.0e-6, 1.0e-3);
+      RSDR_t = Tempdep(RSDR, TRSDR, delTemp, TEMPMOD);
+      if (ASYMMOD != 0) begin
+        RSDRR_t = Tempdep(RSDRR, TRSDR, delTemp, TEMPMOD);
+      end
+      RDDR_t = Tempdep(RDDR, TRDDR, delTemp, TEMPMOD);
+      if (ASYMMOD != 0) begin
+        RDDRR_t = Tempdep(RDDRR, TRDDR, delTemp, TEMPMOD);
+      end
+      VSAT_t = Tempdep(VSAT_i, -AT_i, delTemp, TEMPMOD);
+      if (VSAT_t < 1000) begin
+        $strobe("Warning: VSAT(%f) = %e is less than 1K, setting it to 1K.", DevTemp, VSAT_t);
+        VSAT_t = 1000;
+      end
+      if (ASYMMOD != 0) begin
+        VSATR_t = Tempdep(VSATR_i, -ATR_i, delTemp, TEMPMOD);
+        if (VSATR_t < 1000) begin
+          $strobe("Warning: VSATR(%f) = %e is less than 1K, setting it to 1K.", DevTemp, VSATR_t);
+          VSATR_t = 1000;
+        end
+      end
+      VSAT1_t = Tempdep(VSAT1_i, -AT_i, delTemp, TEMPMOD);
+      if (VSAT1_t < 1000) begin
+        $strobe("Warning: VSAT1(%f) = %e is less than 1K, setting it to 1K.", DevTemp, VSAT1_t);
+        VSAT1_t = 1000;
+      end
+      if (ASYMMOD != 0) begin
+        VSAT1R_t = Tempdep(VSAT1R_i, -AT_i, delTemp, TEMPMOD);
+        if (VSAT1R_t < 1000) begin
+          $strobe("Warning: VSAT1R(%f) = %e is less than 1K, setting it to 1K.", DevTemp, VSAT1R_t);
+          VSAT1R_t = 1000;
+        end
+      end
+      VSATCV_t = Tempdep(VSATCV_i, -ATCV_i, delTemp, TEMPMOD);
+      if (VSATCV_t < 1000) begin
+        $strobe("Warning: VSATCV(%f) = %e is less than 1K, setting it to 1K.", DevTemp, VSATCV_t);
+        VSATCV_t = 1000;
+      end
+      MEXP_t = hypsmooth(MEXP_i * (1.0 + TMEXP * delTemp) - 2.0, 1.0e-3) + 2.0;
+      if (ASYMMOD != 0) begin
+        MEXPR_t = hypsmooth(MEXPR_i * (1.0 + TMEXPR * delTemp) - 2.0, 1.0e-3) + 2.0;
+      end
+      PTWG_t = Tempdep(PTWG_i, -PTWGT_i, delTemp, TEMPMOD);
+      if (ASYMMOD != 0) begin
+        PTWGR_t = Tempdep(PTWGR_i, -PTWGT_i, delTemp, TEMPMOD);
+      end
+      dvth_temp = (KT1_i + KT1L / Leff) * (TRatio - 1.0);
+      BETA0_t = BETA0_i * pow(TRatio, IIT_i);
+      SII0_t = SII0_i * (hypsmooth(1.0 + TII_i * (TRatio - 1.0) - 0.01, 1.0e-3) + 0.01);
+      K0_t = K0_i + K01_i * delTemp;
+      K0SI_t = K0SI_i + hypmax(K0SI1_i * delTemp, -K0SI_i, 1.0e-6);
+      K2SI_t = K2SI_i + hypmax(K2SI1_i * delTemp, -K2SI_i, 1.0e-6);
+      K1_t = K1_i + hypmax(K11_i * delTemp, -K1_i, 1.0e-6);
+      K2SAT_t = K2SAT_i + K2SAT1_i * delTemp;
+      A1_t = A1_i + A11_i * delTemp;
+      A2_t = A2_i + A21_i * delTemp;
+      K2_t = K2_i + hypmax(K21_i * delTemp, -K2_i, 1.0e-6);
+      K0SISAT_t = K0SISAT_i + K0SISAT1_i * delTemp;
+      K2SISAT_t = K2SISAT_i + K2SISAT1_i * delTemp;
+      AIGBINV_t = AIGBINV_i + hypmax(AIGBINV1_i * delTemp, -AIGBINV_i, 1.0e-6);
+      AIGBACC_t = AIGBACC_i + hypmax(AIGBACC1_i * delTemp, -AIGBACC_i, 1.0e-6);
+      AIGC_t = AIGC_i + hypmax(AIGC1_i * delTemp, -AIGC_i, 1.0e-6);
+      AIGS_t = AIGS_i + hypmax(AIGS1_i * delTemp, -AIGS_i, 1.0e-6);
+      AIGD_t = AIGD_i + hypmax(AIGD1_i * delTemp, -AIGD_i, 1.0e-6);
+      BGIDL_t = BGIDL_i * hypsmooth(1.0 + TGIDL_i * delTemp - 1.0e-6, 1.0e-3);
+      BGISL_t = BGISL_i * hypsmooth(1.0 + TGIDL_i * delTemp - 1.0e-6, 1.0e-3);
+      ALPHA0_t = ALPHA0_i + hypmax(ALPHA01 * delTemp, -ALPHA0_i, 1.0e-6);
+      ALPHA1_t = ALPHA1_i + hypmax(ALPHA11 * delTemp, -ALPHA1_i, 1.0e-6);
+      ALPHAII0_t = ALPHAII0_i + hypmax(ALPHAII01 * delTemp, -ALPHAII0_i, 1.0e-25);
+      ALPHAII1_t = ALPHAII1_i + hypmax(ALPHAII11 * delTemp, -ALPHAII1_i, 1.0e-20);
+      igtemp = lexp(IGT_i * lln(TRatio));
+      igsd_mult = igsd_mult0 * igtemp;
+      if (BULKMOD != 0) begin
+        CJS_t = Tempdep(CJS, TCJ, delTemp, TEMPMOD);
+        CJD_t = Tempdep(CJD, TCJ, delTemp, TEMPMOD);
+        CJSWS_t = Tempdep(CJSWS, TCJSW, delTemp, TEMPMOD);
+        CJSWD_t = Tempdep(CJSWD, TCJSW, delTemp, TEMPMOD);
+        CJSWGS_t = Tempdep(CJSWGS, TCJSWG, delTemp, TEMPMOD);
+        CJSWGD_t = Tempdep(CJSWGD, TCJSWG, delTemp, TEMPMOD);
+        PBS_t = hypsmooth(PBS - TPB * delTemp - 0.01, 1.0e-3) + 0.01;
+        PBD_t = hypsmooth(PBD - TPB * delTemp - 0.01, 1.0e-3) + 0.01;
+        PBSWS_t = hypsmooth(PBSWS - TPBSW * delTemp - 0.01, 1.0e-3) + 0.01;
+        PBSWD_t = hypsmooth(PBSWD - TPBSW * delTemp - 0.01, 1.0e-3) + 0.01;
+        PBSWGS_t = hypsmooth(PBSWGS - TPBSWG * delTemp - 0.01, 1.0e-3) + 0.01;
+        PBSWGD_t = hypsmooth(PBSWGD - TPBSWG * delTemp - 0.01, 1.0e-3) + 0.01;
+        T0 = Eg0 / Vtm0 - Eg / Vtm;
+        T1 = lln(TRatio);
+        T3 = lexp((T0 + XTIS * T1) / NJS);
+        JSS_t = JSS * T3;
+        JSWS_t = JSWS * T3;
+        JSWGS_t = JSWGS * T3;
+        T3 = lexp((T0 + XTID * T1) / NJD);
+        JSD_t = JSD * T3;
+        JSWD_t = JSWD * T3;
+        JSWGD_t = JSWGD * T3;
+        JTSS_t = JTSS * lexp(Eg0 * XTSS * (TRatio - 1.0) / Vtm);
+        JTSD_t = JTSD * lexp(Eg0 * XTSD * (TRatio - 1.0) / Vtm);
+        JTSSWS_t = JTSSWS * lexp(Eg0 * XTSSWS * (TRatio - 1.0) / Vtm);
+        JTSSWD_t = JTSSWD * lexp(Eg0 * XTSSWD * (TRatio - 1.0) / Vtm);
+        JTSSWGS_t = JTSSWGS * (sqrt(JTWEFF / Weff0) + 1.0) * lexp(Eg0 * XTSSWGS * (TRatio - 1.0) / Vtm);
+        JTSSWGD_t = JTSSWGD * (sqrt(JTWEFF / Weff0) + 1.0) * lexp(Eg0 * XTSSWGD * (TRatio - 1.0) / Vtm);
+        NJTS_t = hypsmooth(NJTS * (1.0 + TNJTS * (TRatio - 1.0)) - 0.01, 1.0e-3) + 0.01;
+        NJTSD_t = hypsmooth(NJTSD * (1.0 + TNJTSD * (TRatio - 1.0)) - 0.01, 1.0e-3) + 0.01;
+        NJTSSW_t = hypsmooth(NJTSSW * (1.0 + TNJTSSW * (TRatio - 1.0)) - 0.01, 1.0e-3) + 0.01;
+        NJTSSWD_t = hypsmooth(NJTSSWD * (1.0 + TNJTSSWD * (TRatio - 1.0)) - 0.01, 1.0e-3) + 0.01;
+        NJTSSWG_t = hypsmooth(NJTSSWG * (1.0 + TNJTSSWG * (TRatio - 1.0)) - 0.01, 1.0e-3) + 0.01;
+        NJTSSWGD_t = hypsmooth(NJTSSWGD * (1.0 + TNJTSSWGD * (TRatio - 1.0)) - 0.01, 1.0e-3) + 0.01;
+      end
+      if (!$param_given(VFBSD)) begin
+        if (NGATE > 0.0) begin
+          vfbsd = devsign * (hypsmooth(0.5 * Eg - Vtm * lln(NGATE / ni), 1.0e-4) - (0.5 * Eg - devsign * (0.5 * Eg - hypsmooth(0.5 * Eg - Vtm * lln(NSD / ni), 1.0e-4))));
+        end
+        else begin
+          vfbsd = devsign * (PHIG_i - (EASUB + 0.5 * Eg - devsign * (0.5 * Eg - hypsmooth(0.5 * Eg - Vtm * lln(NSD / ni), 1.0e-4))));
+        end
+      end
+      else begin
+        vfbsd = VFBSD;
+      end
+      if (!$param_given(VFBSDCV)) begin
+        vfbsdcv = vfbsd;
+      end
+      else begin
+        vfbsdcv = VFBSDCV;
+      end
+      if (SHMOD != 0 && RTH0 > 0.0) begin
+        T0 = Vtm * lln(nbody / ni);
+        phib = sqrt(T0 * T0 + 1.0e-6);
+      end
+      else begin
+        phib = Vtm * lln(nbody / ni);
+      end
+      if (SHMOD != 0 && RTH0 > 0.0) begin
+        T0 = Vtm * lln(nbody * NSD / (ni * ni));
+        vbi = sqrt(T0 * T0 + 1.0e-6);
+      end
+      else begin
+        vbi = Vtm * lln(nbody * NSD / (ni * ni));
+      end
+      deltaPhi = devsign * (PHIG_i - (EASUB + ((TYPE == 1) ? (0) : (Eg))));
+      eta_mu = 0.5 * ETAMOB_t;
+      eta_mu_cv = 0.5;
+      if (TYPE != 1) begin
+        eta_mu = 1.0 / 3.0 * ETAMOB_t;
+        eta_mu_cv = 1.0 / 3.0;
+      end
+      if (BULKMOD != 0) begin
+        Isbs = ASEJ * JSS_t + PSEJ * JSWS_t + TFIN * NFINtotal * JSWGS_t;
+        if (Isbs > 0.0) begin
+          Nvtms = Vtm * NJS;
+          XExpBVS = lexp(-BVS / Nvtms) * XJBVS;
+          T2 = max(IJTHSFWD / Isbs, 10.0);
+          Tb = 1.0 + T2 - XExpBVS;
+          VjsmFwd = Nvtms * lln(0.5 * (Tb + sqrt(Tb * Tb + 4.0 * XExpBVS)));
+          T0 = lexp(VjsmFwd / Nvtms);
+          IVjsmFwd = Isbs * (T0 - XExpBVS / T0 + XExpBVS - 1.0);
+          SslpFwd = Isbs * (T0 + XExpBVS / T0) / Nvtms;
+          T2 = hypsmooth(IJTHSREV / Isbs - 10.0, 1.0e-3) + 10.0;
+          VjsmRev = -BVS - Nvtms * lln((T2 - 1.0) / XJBVS);
+          T1 = XJBVS * lexp(-(BVS + VjsmRev) / Nvtms);
+          IVjsmRev = Isbs * (1.0 + T1);
+          SslpRev = -Isbs * T1 / Nvtms;
+        end
+        Isbd = ADEJ * JSD_t + PDEJ * JSWD_t + TFIN * NFINtotal * JSWGD_t;
+        if (Isbd > 0.0) begin
+          Nvtmd = Vtm * NJD;
+          XExpBVD = lexp(-BVD / Nvtmd) * XJBVD;
+          T2 = max(IJTHDFWD / Isbd, 10.0);
+          Tb = 1.0 + T2 - XExpBVD;
+          VjdmFwd = Nvtmd * lln(0.5 * (Tb + sqrt(Tb * Tb + 4.0 * XExpBVD)));
+          T0 = lexp(VjdmFwd / Nvtmd);
+          IVjdmFwd = Isbd * (T0 - XExpBVD / T0 + XExpBVD - 1.0);
+          DslpFwd = Isbd * (T0 + XExpBVD / T0) / Nvtmd;
+          T2 = hypsmooth(IJTHDREV / Isbd - 10.0, 1.0e-3) + 10.0;
+          VjdmRev = -BVD - Nvtmd * lln((T2 - 1.0) / XJBVD);
+          T1 = XJBVD * lexp(-(BVD + VjdmRev) / Nvtmd);
+          IVjdmRev = Isbd * (1.0 + T1);
+          DslpRev = -Isbd * T1 / Nvtmd;
+        end
+        Czbs = CJS_t * ASEJ;
+        Czbssw = CJSWS_t * PSEJ;
+        Czbsswg = CJSWGS_t * Weff0 * NFINtotal;
+        Czbd = CJD_t * ADEJ;
+        Czbdsw = CJSWD_t * PDEJ;
+        Czbdswg = CJSWGD_t * Weff0 * NFINtotal;
+      end
+      T0 = Eg / Vtm * (TRatio - 1.0);
+      T1 = T0 / NTGEN_i;
+      igentemp = lexp(T1);
+    end
+    vgs_noswap = devsign * V(ge, si);
+    vds_noswap = devsign * V(di, si);
+    vgd_noswap = devsign * V(ge, di);
+    ves_jct = devsign * V(e, si);
+    ved_jct = devsign * V(e, di);
+    vge = devsign * V(ge, e);
+    sigvds = 1.0;
+    if (vds_noswap < 0.0) begin
+      sigvds = -1.0;
+      vgs = vgs_noswap - vds_noswap;
+      vds = -1.0 * vds_noswap;
+      ves = ved_jct;
+    end
+    else begin
+      vgs = vgs_noswap;
+      vds = vds_noswap;
+      ves = ves_jct;
+    end
+    vgsfb = vgs - deltaPhi;
+    etaiv = 0.0;
+    Qes = 0.0;
+    Qesj = 0.0;
+    Qeg = 0.0;
+    Qed = 0.0;
+    Qedj = 0.0;
+    vdsx = sqrt(vds * vds + 0.01) - 0.1;
+    if (BULKMOD != 0) begin
+      vesx = ves - 0.5 * (vds - vdsx);
+      vesmax = 0.95 * PHIBE_i;
+      T2 = vesmax - vesx - 1.0e-3;
+      veseff = vesmax - 0.5 * (T2 + sqrt(T2 * T2 + 0.004 * vesmax));
+    end
+    T0 = tanh(0.6 * vds_noswap / Vtm);
+    wf = 0.5 + 0.5 * T0;
+    wr = 1.0 - wf;
+    if (ASYMMOD != 0) begin
+      CDSCD_a = CDSCDR_i * wr + CDSCD_i * wf;
+      ETA0_a = ETA0R_t * wr + ETA0_t * wf;
+      PDIBL1_a = PDIBL1R_i * wr + PDIBL1_i * wf;
+      PDIBL2_a = PDIBL2R_i * wr + PDIBL2_i * wf;
+      MEXP_a = MEXPR_t * wr + MEXP_t * wf;
+      PTWG_a = PTWGR_t * wr + PTWG_t * wf;
+      VSAT1_a = VSAT1R_t * wr + VSAT1_t * wf;
+      RSDR_a = RSDRR_t * wr + RSDR_t * wf;
+      RDDR_a = RDDRR_t * wr + RDDR_t * wf;
+      PCLM_a = PCLMR_i * wr + PCLM_i * wf;
+      VSAT_a = VSATR_t * wr + VSAT_t * wf;
+      KSATIV_a = KSATIVR_i * wr + KSATIV_i * wf;
+      DVTSHIFT_a = DVTSHIFTR_i * wr + DVTSHIFT_i * wf;
+      CIT_a = CITR_i * wr + CIT_i * wf;
+      u0_a = u0r * wr + u0 * wf;
+      UA_a = UAR_t * wr + UA_t * wf;
+      UD_a = UDR_t * wr + UD_t * wf;
+      UC_a = UCR_t * wr + UC_t * wf;
+      EU_a = EUR_i * wr + EU_i * wf;
+    end
+    else begin
+      CDSCD_a = CDSCD_i;
+      ETA0_a = ETA0_t;
+      PDIBL1_a = PDIBL1_i;
+      PDIBL2_a = PDIBL2_i;
+      MEXP_a = MEXP_t;
+      PTWG_a = PTWG_t;
+      VSAT1_a = VSAT1_t;
+      RSDR_a = RSDR_t;
+      RDDR_a = RDDR_t;
+      PCLM_a = PCLM_i;
+      VSAT_a = VSAT_t;
+      KSATIV_a = KSATIV_i;
+      DVTSHIFT_a = DVTSHIFT_i;
+      CIT_a = CIT_i;
+      u0_a = u0;
+      UA_a = UA_t;
+      UD_a = UD_t;
+      UC_a = UC_t;
+      EU_a = EU_i;
+    end
+    inv_MEXP = 1.0 / MEXP_a;
+    phist = 0.4 + phib + PHIN_i;
+    T1 = 2.0 * (Cins / Weff_UFCM) / (rc + 2.0);
+    cdsc = Theta_SW * (CDSC_i + CDSCD_a * vdsx);
+    if (!$param_given(NVTM))
+      nVtm = Vtm * ThetaSS * (1.0 + (CIT_a + cdsc) / T1);
+    else
+      nVtm = NVTM;
+    qdep = Qdep_ov_Cins / nVtm;
+    vth_fixed_factor_SI = ln(Cins * nVtm / (1.60219e-19 * Nc * 2.0 * Ach));
+    vth_fixed_factor_Sub = ln((qdep * rc) * (qdep * rc) / (exp(qdep * rc) - qdep * rc - 1.0)) + vth_fixed_factor_SI;
+    q0 = 10.0 * nVtm / rc + 2.0 * qbs;
+    fieldnormalizationfactor = Vtm * Cins / (Weff_UFCM * epssub);
+    auxQMfact = pow(((3.0 / 4.0) * 3.0 * 1.05457e-34 * 2.0 * 3.14159265358979323846 * 1.60219e-19 / (4.0 * sqrt(2.0 * mx))), 2.0 / 3.0);
+    QMFACTORCVfinal = QMFACTORCV * auxQMfact * pow(fieldnormalizationfactor, 2.0 / 3.0) * (1 / (1.60219e-19 * Vtm));
+    dvth_vtroll = -DVT0_i * Theta_SCE * (vbi - phist);
+    dvth_dibl = -ETA0_a * Theta_DIBL * vdsx + (DVTP0_i * Theta_DITS * pow(vdsx, DVTP1_i));
+    dvth_rsce = K1RSCE_i * Theta_RSCE * sqrt(phist);
+    dvth_all = dvth_vtroll + dvth_dibl + dvth_rsce + dvth_temp + DVTSHIFT_a;
+    vgsfb = vgsfb - dvth_all;
+    beta0 = u0_a * cox * Weff0 / Leff;
+    T0 = -(dvch_qm + nVtm * lln(2.0 * cox * Imin / (beta0 * nVtm * 1.60219e-19 * Nc * TFIN)));
+    T1 = vgsfb + T0 + DELVTRAND;
+    vgsfbeff = hypsmooth(T1, 1.0e-4) - T0;
+    vch = 0.0 + dvch_qm;
+    if (BULKMOD != 0) begin
+      T1 = hypsmooth(2.0 * phib + vch - ves, 0.1);
+      T3 = (-K1_t / (2.0 * nVtm)) * (sqrt(T1) - sqrt(2.0 * phib));
+      T0 = -qdep - T3 + vth_fixed_factor_Sub + QMFACTORCVfinal * pow(-qdep, 2.0 / 3.0);
+      T1 = -qdep - T3 + vth_fixed_factor_SI;
+    end
+    else begin
+      T0 = -qdep + vth_fixed_factor_Sub + QMFACTORCVfinal * pow(-qdep, 2.0 / 3.0);
+      T1 = -qdep + vth_fixed_factor_SI;
+    end
+    T2 = (vgsfbeff - vch) / nVtm;
+    F0 = -T2 + T1;
+    T3 = 0.5 * (T2 - T0);
+    qm = exp(T3);
+    if (qm > 1.0e-7) begin
+      T7 = ln(1.0 + qm);
+      qm = 2.0 * (1.0 - sqrt(1.0 + T7 * T7));
+      T8 = (qm * ALPHA_UFCM + qdep) * rc;
+      T4 = T8 / (exp(T8) - T8 - 1.0);
+      T5 = T8 * T4;
+      e0 = F0 - qm + ln(-qm) + ln(T5) + QMFACTORCVfinal * pow(-(qm + qdep), 2.0 / 3.0);
+      e1 = -1.0 + 1.0 / qm + (2.0 / T8 - T4 - 1.0) * rc - (2.0 / 3.0) * QMFACTORCVfinal * pow(-(qm + qdep), -1.0 / 3.0);
+      e2 = -1.0 / (qm * qm) - (2.0 / 9.0) * QMFACTORCVfinal * pow(-(qm + qdep), -4.0 / 3.0);
+      qm = qm - (e0 / e1) * (1.0 + (e0 * e2) / (2.0 * e1 * e1));
+      T8 = (qm * ALPHA_UFCM + qdep) * rc;
+      T4 = T8 / (exp(T8) - T8 - 1.0);
+      T5 = T8 * T4;
+      e0 = F0 - qm + ln(-qm) + ln(T5) + QMFACTORCVfinal * pow(-(qm + qdep), 2.0 / 3.0);
+      e1 = -1.0 + 1.0 / qm + (2.0 / T8 - T4 - 1.0) * rc - (2.0 / 3.0) * QMFACTORCVfinal * pow(-(qm + qdep), -1.0 / 3.0);
+      e2 = -1.0 / (qm * qm) - (2.0 / 9.0) * QMFACTORCVfinal * pow(-(qm + qdep), -4.0 / 3.0);
+      qm = qm - (e0 / e1) * (1.0 + (e0 * e2) / (2.0 * e1 * e1));
+    end
+    else begin
+      qm = -qm * qm;
+    end
+    qis = -qm * nVtm;
+    Eeffs = EeffFactor * (qbs + eta_mu * qis);
+    qb0 = 1.0e-2 / cox;
+    T2 = pow(0.5 * (1.0 + abs(qis / qb0)), UCS_t);
+    if (BULKMOD != 0) begin
+      T3 = (UA_a + UC_a * veseff) * pow(abs(Eeffs), EU_a) + UD_a / T2;
+    end
+    else begin
+      T3 = UA_a * pow(abs(Eeffs), EU_a) + UD_a / T2;
+    end
+    Dmobs = 1.0 + T3;
+    Dmobs = Dmobs / U0MULT;
+    if (RDSMOD == 1) begin
+      Rdss = 0.0;
+    end
+    else
+      if (RDSMOD == 0) begin
+        T4 = 1.0 + PRWGS_i * qis;
+        T1 = 1.0 / T4;
+        T0 = 0.5 * (T1 + sqrt(T1 * T1 + 0.01));
+        Rdss = (RDSWMIN_i + RDSW_i * T0) * WeffWRFactor * NFINtotal * rdstemp;
+      end
+      else begin
+        T4 = 1.0 + PRWGS_i * qis;
+        T1 = 1.0 / T4;
+        T0 = 0.5 * (T1 + sqrt(T1 * T1 + 0.01));
+        Rdss = (RSourceGeo + RDrainGeo + RDSWMIN_i + RDSW_i * T0) * WeffWRFactor * NFINtotal * rdstemp;
+      end
+    Esat = 2.0 * VSAT_a / u0_a * Dmobs;
+    EsatL = Esat * Leff;
+    T6 = KSATIV_a * (qis + 2 * Vtm);
+    if (Rdss == 0.0) begin
+      Vdsat = EsatL * T6 / (EsatL + T6);
+    end
+    else begin
+      WVCox = Weff0 * VSAT_a * cox;
+      T0 = WVCox * Rdss;
+      Ta = 2.0 * T0;
+      Tb = T6 + EsatL + 3.0 * T6 * T0;
+      Tc = T6 * (EsatL + 2.0 * T6 * T0);
+      Vdsat = (Tb - sqrt(Tb * Tb - 2.0 * Ta * Tc)) / Ta;
+    end
+    Vdsat = hypsmooth(Vdsat - 1.0e-3, 1.0e-5) + 1.0e-3;
+    T7 = pow(vds / Vdsat, MEXP_a);
+    T8 = pow(1.0 + T7, inv_MEXP);
+    Vdseff = vds / T8;
+    if (Vdseff > vds) begin
+      Vdseff = vds;
+    end
+    vch = Vdseff + dvch_qm;
+    if (BULKMOD != 0) begin
+      T1 = hypsmooth(2.0 * phib + vch - ves, 0.1);
+      T3 = (-K1_t / (2.0 * nVtm)) * (sqrt(T1) - sqrt(2.0 * phib));
+      T0 = -qdep - T3 + vth_fixed_factor_Sub + QMFACTORCVfinal * pow(-qdep, 2.0 / 3.0);
+      T1 = -qdep - T3 + vth_fixed_factor_SI;
+    end
+    else begin
+      T0 = -qdep + vth_fixed_factor_Sub + QMFACTORCVfinal * pow(-qdep, 2.0 / 3.0);
+      T1 = -qdep + vth_fixed_factor_SI;
+    end
+    T2 = (vgsfbeff - vch) / nVtm;
+    F0 = -T2 + T1;
+    T3 = (T2 - T0) * 0.5;
+    qm = exp(T3);
+    if (qm > 1.0e-7) begin
+      T7 = ln(1.0 + qm);
+      qm = 2.0 * (1.0 - sqrt(1.0 + T7 * T7));
+      T8 = (qm * ALPHA_UFCM + qdep) * rc;
+      T4 = T8 / (exp(T8) - T8 - 1.0);
+      T5 = T8 * T4;
+      e0 = F0 - qm + ln(-qm) + ln(T5) + QMFACTORCVfinal * pow(-(qm + qdep), 2.0 / 3.0);
+      e1 = -1.0 + (1.0 / qm) + (2.0 / T8 - T4 - 1.0) * rc - (2.0 / 3.0) * QMFACTORCVfinal * pow(-(qm + qdep), -1.0 / 3.0);
+      e2 = -1.0 / (qm * qm) - (2.0 / 9.0) * QMFACTORCVfinal * pow(-(qm + qdep), -4.0 / 3.0);
+      qm = qm - (e0 / e1) * (1.0 + (e0 * e2) / (2.0 * e1 * e1));
+      T8 = (qm * ALPHA_UFCM + qdep) * rc;
+      T4 = T8 / (exp(T8) - T8 - 1.0);
+      T5 = T8 * T4;
+      e0 = F0 - qm + ln(-qm) + ln(T5) + QMFACTORCVfinal * pow(-(qm + qdep), 2.0 / 3.0);
+      e1 = -1.0 + (1.0 / qm) + (2.0 / T8 - T4 - 1.0) * rc - (2.0 / 3.0) * QMFACTORCVfinal * pow(-(qm + qdep), -1.0 / 3.0);
+      e2 = -1.0 / (qm * qm) - (2.0 / 9.0) * QMFACTORCVfinal * pow(-(qm + qdep), -4.0 / 3.0);
+      qm = qm - (e0 / e1) * (1.0 + (e0 * e2) / (2.0 * e1 * e1));
+    end
+    else begin
+      qm = -qm * qm;
+    end
+    qid = -qm * nVtm;
+    if (BULKMOD != 0) begin
+      T9 = (K1_t / (2.0 * nVtm)) * sqrt(Vtm);
+      T0 = T9 / 2.0;
+      T2 = (vge - (deltaPhi - Eg - Vtm * ln(NBODY / Nc) + DELVFBACC)) / Vtm;
+      if ((T2 * Vtm) > phib + T9 * sqrt(phib * Vtm)) begin
+        T1 = sqrt(T2 - 1.0 + T0 * T0) - T0;
+        T10 = 1.0 + T1 * T1;
+      end
+      else begin
+        T3 = T2 * 0.5 - 3.0 * (1.0 + T9 / sqrt(2.0));
+        T10 = T3 + sqrt(T3 * T3 + 6.0 * T2);
+        if (T2 < 0.0) begin
+          T4 = (T2 - T10) / T9;
+          T10 = -ln(1.0 - T10 + T4 * T4);
+        end
+        else begin
+          T11 = exp(-T10);
+          T4 = sqrt(T2 - 1.0 + T11 + T0 * T0) - T0;
+          T10 = 1.0 - T11 + T4 * T4;
+        end
+      end
+      T6 = exp(-T10) - 1.0;
+      T7 = sqrt(T6 + T10);
+      if (T10 > 1.0e-15) begin
+        e0 = -(T2 - T10) + T9 * T7;
+        e1 = 1.0 - T9 * 0.5 * T6 / T7;
+        T8 = T10 - (e0 / e1);
+        T11 = exp(-T8) - 1.0;
+        T12 = sqrt(T11 + T8);
+        qba = -T9 * T12 * Vtm;
+      end
+      else begin
+        if (T10 < -1.0e-15) begin
+          e0 = -(T2 - T10) - T9 * T7;
+          e1 = 1.0 + T9 * 0.5 * T6 / T7;
+          T8 = T10 - e0 / e1;
+          T12 = T9 * sqrt(exp(-T8) + T8 - 1.0);
+        end
+        else begin
+          T12 = 0.0;
+          T8 = 0.0;
+        end
+        qba = T12 * Vtm;
+      end
+      qi_acc_for_QM = T9 * exp(-T8 / 2.0) * Vtm;
+      psipclamp = 0.5 * (T8 + 1.0 + sqrt((T8 - 1.0) * (T8 - 1.0) + 0.25 * 2.0 * 2.0));
+      sqrtpsip = sqrt(psipclamp);
+      nq = 1.0 + T9 / sqrtpsip;
+    end
+    qia = 0.5 * (qis + qid);
+    dqi = qis - qid;
+    T0 = pow(Vdseff, 2.0) / 6.25e-4;
+    if (CHARGEWF != 0.0)
+      qia2 = 0.5 * (qis + qid) + CHARGEWF * (1.0 - lexp(-T0)) * 0.5 * dqi;
+    else
+      qia2 = 0.5 * (qis + qid);
+    if (QMTCENCV_i > 0.0) begin
+      T4 = qia / QM0;
+      T5 = 1.0 + pow(T4, PQM);
+      Tcen = Tcen0 / T5;
+      coxeff = 1.0 / (1.0 / (cox * EOT / TOXP) + Tcen * QMTCENCV_i / epssub);
+    end
+    else begin
+      coxeff = cox;
+    end
+    if (BULKMOD != 0 && QMTCENCVA_i != 0.0) begin
+      T6 = 1.0 + pow(qi_acc_for_QM / QM0ACC, PQMACC);
+      Tcen = Tcen0 / T6;
+      cox_acc = 1.0 / (1.0 / cox_acc + Tcen * QMTCENCVA_i / epssub);
+    end
+    beta = u0_a * cox * Weff0 / Leff;
+    Eeffm = EeffFactor * (qba + eta_mu * qia2);
+    T2 = pow(0.5 * (1.0 + abs(qia2 / qb0)), UCS_t);
+    if (BULKMOD != 0) begin
+      T3 = (UA_a + UC_a * veseff) * pow(abs(Eeffm), EU_a) + UD_a / T2;
+    end
+    else begin
+      T3 = UA_a * pow(abs(Eeffm), EU_a) + UD_a / T2;
+    end
+    Dmob = 1.0 + T3;
+    Dmob = Dmob / U0MULT;
+    ueff = u0_a / Dmob;
+    Eeffm_cv = EeffFactor * (qba + eta_mu_cv * qia2);
+    T3 = UA_a * pow(abs(Eeffm_cv), EU_a) + UD_a / T2;
+    Dmob_cv = 1.0 + T3;
+    Dmob_cv = Dmob_cv / U0MULT;
+    tmp = DROUT_i * Leff / scl + 1.0e-6;
+    if (tmp < 40.0) begin
+      DIBLfactor = 0.5 * PDIBL1_a / (cosh(tmp) - 1.0) + PDIBL2_a;
+    end
+    else begin
+      DIBLfactor = PDIBL1_a * exp(-tmp) + PDIBL2_a;
+    end
+    if (PVAG_i > 0.0) begin
+      PVAGfactor = 1.0 + PVAG_i * qia / EsatL;
+    end
+    else begin
+      PVAGfactor = 1.0 / (1.0 - PVAG_i * qia / EsatL);
+    end
+    if (Vdseff > vds) begin
+      Vdseff = vds;
+    end
+    diffVds = vds - Vdseff;
+    Vgst2Vtm = qia + 2.0 * Vtm;
+    if (DIBLfactor > 0) begin
+      T1 = Vgst2Vtm;
+      T3 = T1 / (Vdsat + T1);
+      VaDIBL = T1 / DIBLfactor * T3 * PVAGfactor;
+      Moc = 1.0 + diffVds / VaDIBL;
+    end
+    else begin
+      Moc = 1.0;
+    end
+    if (PCLM_a > 0.0) begin
+      if (PCLMG_i < 0.0) begin
+        T1 = 1.0 / (1.0 / PCLM_a - PCLMG_i * qia);
+      end
+      else begin
+        T1 = PCLM_a + PCLMG_i * qia;
+      end
+      Mclm = 1.0 + T1 * lln(1.0 + (vds - Vdseff) / T1 / (Vdsat + EsatL));
+    end
+    else begin
+      Mclm = 1.0;
+    end
+    Moc = Moc * Mclm;
+    Esat1 = 2.0 * VSAT1_a / ueff;
+    Esat1L = Esat1 * Leff;
+    T0 = lexp(PSAT_i * lln(dqi / Esat1L));
+    Ta = (1.0 + lexp(1.0 / PSAT_i * lln(DELTAVSAT_i)));
+    Dvsat = (1.0 + lexp(1.0 / PSAT_i * lln(DELTAVSAT_i + T0))) / Ta;
+    Dvsat = Dvsat + 0.5 * PTWG_a * qia * dqi * dqi;
+    T0 = A1_t + A2_t / (qia + 2.0 * nVtm);
+    T1 = T0 * dqi * dqi;
+    T2 = T1 + 1.0 - 0.001;
+    T3 = -1.0 + 0.5 * (T2 + sqrt(T2 * T2 + 0.004));
+    Nsat = 0.5 * (1.0 + sqrt(1.0 + T3));
+    Dvsat = Dvsat * Nsat;
+    if (K0_t != 0) begin
+      T1 = K0_t / (max(0, K0SI_t + K0SISAT_t * dqi * dqi) * qia + 2.0 * nVtm);
+      Mnud = lexp(-T1);
+    end
+    else begin
+      Mnud = 1.0;
+    end
+    if (BULKMOD == 2) begin
+      T0 = hypsmooth((K2_t + K2SAT_t * vdsx), 1.0e-6);
+      T1 = T0 / (max(0, K2SI_t + K2SISAT_t * dqi * dqi) * qia + 2.0 * nVtm);
+      T3 = sqrt(PHIBE_i - veseff) - sqrt(PHIBE_i);
+      Mob = lexp(-T1 * T3);
+    end
+    else
+      Mob = 1.0;
+    EsatCV = 2.0 * VSATCV_t * Dmob_cv / u0_a;
+    EsatCVL = EsatCV * LeffCV;
+    T0 = lexp(PSATCV_i * lln(dqi / EsatCVL));
+    Ta = (1.0 + lexp(1.0 / PSATCV_i * lln(DELTAVSATCV_i)));
+    DvsatCV = (1.0 + lexp(1.0 / PSATCV_i * lln(DELTAVSATCV_i + T0))) / Ta;
+    if (PCLMCV_i != 0) begin
+      MclmCV = 1.0 + PCLMCV_i * lln(1.0 + (vds - Vdseff) / PCLMCV_i / (Vdsat + EsatCVL));
+    end
+    else begin
+      MclmCV = 1.0;
+    end
+    qb = -1.60219e-19 * nbody * Ach * LeffCV;
+    T1 = qia;
+    etaiv = q0 / (q0 + qia);
+    T2 = (2.0 - etaiv) * nVtm;
+    ids0_ov_dqi = T1 + T2;
+    ids0 = ids0_ov_dqi * dqi;
+    case (RDSMOD)       1: begin
+        Rdsi = 0.0;
+        Dr = 1.0;
+        T2 = vgs_noswap - vfbsd;
+        T3 = sqrt(T2 * T2 + 1.0e-1);
+        vgs_eff = 0.5 * (T2 + T3);
+        T4 = 1.0 + PRWGS_i * vgs_eff;
+        T1 = 1.0 / T4;
+        T0 = 0.5 * (T1 + sqrt(T1 * T1 + 0.01));
+        T5 = RSW_i * (1.0 + RSDR_a * lexp(0.5 * PRSDR * lln(V(si, s) * V(si, s) + 1.0E-6)));
+        Rsource = rdstemp * (RSourceGeo + (RSWMIN_i + T5 * T0) * WeffWRFactor);
+        T2 = vgd_noswap - vfbsd;
+        T3 = sqrt(T2 * T2 + 1.0e-1);
+        vgd_eff = 0.5 * (T2 + T3);
+        T4 = 1.0 + PRWGD_i * vgd_eff;
+        T1 = 1.0 / T4;
+        T0 = 0.5 * (T1 + sqrt(T1 * T1 + 0.01));
+        T5 = RDW_i * (1.0 + RDDR_a * lexp(0.5 * PRDDR * lln(V(di, d) * V(di, d) + 1.0E-6)));
+        Rdrain = rdstemp * (RDrainGeo + (RDWMIN_i + T5 * T0) * WeffWRFactor);
+      end
+
+      0: begin
+        Rsource = RSourceGeo;
+        Rdrain = RDrainGeo;
+        T4 = 1.0 + PRWGS_i * qia;
+        T1 = 1.0 / T4;
+        T0 = 0.5 * (T1 + sqrt(T1 * T1 + 0.01));
+        Rdsi = rdstemp * (RDSWMIN_i + RDSW_i * T0) * WeffWRFactor;
+        Dr = 1.0 + NFINtotal * beta * ids0_ov_dqi / (Dmob * Dvsat) * Rdsi;
+      end
+
+      2: begin
+        T4 = 1.0 + PRWGS_i * qia;
+        T1 = 1.0 / T4;
+        T0 = 0.5 * (T1 + sqrt(T1 * T1 + 0.01));
+        Rdsi = rdstemp * (RSourceGeo + RDrainGeo + RDSWMIN_i + RDSW_i * T0) * WeffWRFactor;
+        Dr = 1.0 + NFINtotal * beta * ids0_ov_dqi / (Dmob * Dvsat) * Rdsi;
+        Rsource = 0.0;
+        Rdrain = 0.0;
+      end
+
+    endcase
+    ids = NFINtotal * beta * ids0 * Moc * Mnud * Mob / (Dmob * Dvsat * Dr);
+    ids = ids * IDS0MULT;
+    T11 = (2.0 * qia + nVtm) / DvsatCV;
+    qg = qia + dqi * dqi / (6.0 * T11);
+    qd = -0.5 * (qia - (dqi / 6.0) * (1.0 - (dqi / T11) * (1 + dqi / (5.0 * T11))));
+    inv_MclmCV = 1.0 / MclmCV;
+    qg = inv_MclmCV * qg + (MclmCV - 1.0) * qid;
+    qd = inv_MclmCV * inv_MclmCV * qd + 0.5 * (MclmCV - inv_MclmCV) * qid;
+    qs = -qg - qd;
+    T6 = NFINtotal * WeffCV0 * LeffCV * coxeff;
+    qg = T6 * qg;
+    qd = T6 * qd;
+    qs = T6 * qs;
+    qinv = qg;
+    if (BULKMOD != 0) begin
+      T1 = NFINtotal * WeffCV0 * LeffCV_acc * cox_acc;
+      T7 = qi_acc_for_QM;
+      T10 = T7 * T1;
+      qg_acc = -T10;
+      qb_acc = T10;
+      T1 = NFINtotal * WeffCV0 * LeffCV * cox;
+      T2 = qba - qi_acc_for_QM;
+      T10 = T1 * T2;
+      qg_acc = qg_acc - T10;
+      qb_acc = qb_acc + T10;
+      T1 = NFINtotal * WeffCV0 * LeffCV * cox;
+      T2 = (nq - 1.0) * 0.5 * (qia + (dqi * dqi / (6.0 * T11)));
+      T10 = T1 * T2;
+      qg_acc = qg_acc - T10;
+      qb_acc = qb_acc + T10;
+    end
+    if (sigvds < 0) begin
+      T1 = qd;
+      qd = qs;
+      qs = T1;
+    end
+    qgs_ov = 0.0;
+    qgd_ov = 0.0;
+    if (CGEOMOD != 1) begin
+      T1 = NFINtotal * WeffCV0 * devsign;
+      T2 = devsign * V(ge, si);
+      T0 = T2 - vfbsdcv + 0.02;
+      vgs_overlap = 0.5 * (T0 - sqrt(T0 * T0 + 4.0 * 0.02));
+      qgs_ov = T1 * (CGSL_i * (T2 - vfbsdcv - vgs_overlap - 0.5 * CKAPPAS_i * (sqrt(1.0 - 4.0 * vgs_overlap / CKAPPAS_i) - 1.0)) + CGSO_i * T2);
+      T2 = devsign * V(ge, di);
+      T0 = T2 - vfbsdcv + 0.02;
+      vgd_overlap = 0.5 * (T0 - sqrt(T0 * T0 + 4.0 * 0.02));
+      qgd_ov = T1 * (CGDL_i * (T2 - vfbsdcv - vgd_overlap - 0.5 * CKAPPAD_i * (sqrt(1.0 - 4.0 * vgd_overlap / CKAPPAD_i) - 1.0)) + CGDO_i * T2);
+    end
+    if (CGEOMOD == 0) begin
+      T1 = NFINtotal * WeffCV0;
+      qgs_fr = T1 * CFS_i * V(ge, si);
+      qgd_fr = T1 * CFD_i * V(ge, di);
+      qgs_parasitic = qgs_ov + qgs_fr;
+      qgd_parasitic = qgd_ov + qgd_fr;
+    end
+    else
+      if (CGEOMOD == 1) begin
+        if (CGEO1SW == 1) begin
+          T0 = NFINtotal * WeffCV0;
+          COVS_i = T0 * COVS_i;
+          COVD_i = T0 * COVD_i;
+          cgsp = T0 * CGSP;
+          cgdp = T0 * CGDP;
+        end
+        else begin
+          cgsp = CGSP;
+          cgdp = CGDP;
+        end
+        qgs_ov = COVS_i * V(ge, si);
+        qgd_ov = COVD_i * V(ge, di);
+        qgs_parasitic = qgs_ov;
+        qgd_parasitic = qgd_ov;
+        qgs_fr = cgsp * V(ge, s);
+        qgd_fr = cgdp * V(ge, d);
+      end
+      else begin
+        qgs_fr = Cfr_geo * V(ge, si);
+        qgd_fr = Cfr_geo * V(ge, di);
+        qgs_parasitic = qgs_ov + qgs_fr;
+        qgd_parasitic = qgd_ov + qgd_fr;
+      end
+    qds_fr = CDSP * V(d, s);
+    Iii = 0.0;
+    if (IIMOD == 1) begin
+      T0 = (ALPHA0_t + ALPHA1_t * Leff) / Leff;
+      if ((T0 <= 0.0) || (BETA0_t <= 0.0))
+        Iii = 0.0;
+      else begin
+        T1 = -BETA0_t / (diffVds + 1.0e-30);
+        Iii = T0 * diffVds * ids * lexp(T1);
+      end
+    end
+    else
+      if (IIMOD == 2) begin
+        ALPHAII = (ALPHAII0_t + ALPHAII1_t * Leff) / Leff;
+        if (ALPHAII <= 0.0) begin
+          Iii = 0.0;
+        end
+        else begin
+          T0 = ESATII_i * Leff;
+          T1 = SII0_t * T0 / (1.0 + T0);
+          T0 = 1.0 / (1.0 + hypsmooth(SII1_i * vgsfbeff, IIMOD2CLAMP1));
+          T3 = T0 + SII2_i;
+          T2 = hypsmooth(vgsfbeff * T3, IIMOD2CLAMP2);
+          T3 = 1.0 / (1.0 + SIID_i * vds);
+          VgsStep = T1 * T2 * T3;
+          Vdsatii = VgsStep * (1.0 - LII_i / Leff);
+          Vdiff = vds - Vdsatii;
+          T0 = BETAII2_i + BETAII1_i * Vdiff + BETAII0_i * Vdiff * Vdiff;
+          T1 = sqrt(T0 * T0 + 1.0e-10);
+          Ratio = -hypmax(-ALPHAII * lexp(Vdiff / T1), -10.0, IIMOD2CLAMP3);
+          Iii = Ratio * ids;
+        end
+      end
+    igbinv = 0.0;
+    igbacc = 0.0;
+    igcs = 0.0;
+    igcd = 0.0;
+    igs = 0.0;
+    igd = 0.0;
+    if (IGBMOD != 0) begin
+      T1 = (qia - EIGBINV_i) / NIGBINV_i / Vtm;
+      Vaux_Igbinv = NIGBINV_i * Vtm * lln(1.0 + lexp(T1));
+      T2 = AIGBINV_t - BIGBINV_i * qia;
+      T3 = 1.0 + CIGBINV_i * qia;
+      T4 = -9.82222e11 * TOXG * T2 * T3;
+      T5 = lexp(T4);
+      T6 = 3.75956e-7;
+      igbinv = Weff0 * Leff * T6 * Toxratio * vge * Vaux_Igbinv * T5;
+      igbinv = igbinv * igtemp;
+      vfbzb = deltaPhi - (Eg / 2.0) - phib;
+      T0 = vfbzb - vge;
+      T1 = T0 / NIGBACC_i / Vtm;
+      Vaux_Igbacc = NIGBACC_i * Vtm * lln(1.0 + lexp(T1));
+      if (BULKMOD != 0) begin
+        Voxacc = qi_acc_for_QM;
+      end
+      else begin
+        if (vfbzb <= 0)
+          Voxacc = 0.5 * (T0 - 0.02 + sqrt((T0 - 0.02) * (T0 - 0.02) - 0.08 * vfbzb));
+        else
+          Voxacc = 0.5 * (T0 - 0.02 + sqrt((T0 - 0.02) * (T0 - 0.02) + 0.08 * vfbzb));
+      end
+      T2 = AIGBACC_t - BIGBACC_i * Voxacc;
+      T3 = 1.0 + CIGBACC_i * Voxacc;
+      T4 = -7.45669e11 * TOXG * T2 * T3;
+      T5 = lexp(T4);
+      T6 = 4.97232e-7;
+      igbacc = Weff0 * Leff * T6 * Toxratio * vge * Vaux_Igbacc * T5;
+      igbacc = igbacc * igtemp;
+    end
+    if (IGCMOD != 0) begin
+      T1 = AIGC_t - BIGC_i * qia;
+      T2 = 1.0 + CIGC_i * qia;
+      T3 = -Bechvb * TOXG * T1 * T2;
+      T4 = qia * lexp(T3);
+      T5 = (vge + 0.5 * vdsx + 0.5 * (ves_jct + ved_jct));
+      igc0 = Weff0 * Leff * Aechvb * Toxratio * T4 * T5 * igtemp;
+      Vdseffx = sqrt(Vdseff * Vdseff + 0.01) - 0.1;
+      T1 = PIGCD_i * Vdseffx;
+      T1_exp = lexp(-T1);
+      T3 = T1 + T1_exp - 1.0 + 1.0e-4;
+      T4 = 1.0 - (T1 + 1.0) * T1_exp + 1.0e-4;
+      T5 = T1 * T1 + 2.0e-4;
+      igcd = igc0 * T4 / T5;
+      igcs = igc0 * T3 / T5;
+      T0 = vgs_noswap - vfbsd;
+      vgs_eff = sqrt(T0 * T0 + 1.0e-4);
+      if (IGCLAMP == 1) begin
+        T1 = hypsmooth((AIGS_t - BIGS_i * vgs_eff), 1.0e-6);
+        if (CIGS_i < 0.01) begin
+          CIGS_i = 0.01;
+        end
+      end
+      else begin
+        T1 = AIGS_t - BIGS_i * vgs_eff;
+      end
+      T2 = 1.0 + CIGS_i * vgs_eff;
+      T3 = -Bechvb * TOXG * POXEDGE_i * T1 * T2;
+      T4 = lexp(T3);
+      if (sigvds > 0.0) begin
+        igs = igsd_mult * DLCIGS * vgs_noswap * vgs_eff * T4;
+      end
+      else begin
+        igd = igsd_mult * DLCIGS * vgs_noswap * vgs_eff * T4;
+      end
+      T0 = vgd_noswap - vfbsd;
+      vgd_eff = sqrt(T0 * T0 + 1.0e-4);
+      if (IGCLAMP == 1) begin
+        T1 = hypsmooth((AIGD_t - BIGD_i * vgd_eff), 1.0e-6);
+        if (CIGD_i < 0.01) begin
+          CIGD_i = 0.01;
+        end
+      end
+      else begin
+        T1 = AIGD_t - BIGD_i * vgd_eff;
+      end
+      T2 = 1.0 + CIGD_i * vgd_eff;
+      T3 = -Bechvb * TOXG * POXEDGE_i * T1 * T2;
+      T4 = lexp(T3);
+      if (sigvds > 0.0) begin
+        igd = igsd_mult * DLCIGD * vgd_noswap * vgd_eff * T4;
+      end
+      else begin
+        igs = igsd_mult * DLCIGD * vgd_noswap * vgd_eff * T4;
+      end
+    end
+    igisl = 0.0;
+    igidl = 0.0;
+    if (GIDLMOD != 0) begin
+      T0 = epsratio * EOT;
+      if ((AGIDL_i <= 0.0) || (BGIDL_t <= 0.0)) begin
+        T6 = 0.0;
+      end
+      else begin
+        T1 = (-vgd_noswap - EGIDL_i + vfbsd) / T0;
+        T1 = hypsmooth(T1, 1.0e-2);
+        T2 = BGIDL_t / (T1 + 1.0e-3);
+        T3 = lexp(PGIDL_i * lln(T1));
+        if (BULKMOD != 0) begin
+          T4 = -ved_jct * ved_jct * ved_jct;
+          T4a = CGIDL_i + abs(T4) + 1.0e-5;
+          T5 = hypsmooth(T4 / T4a, 1.0e-6) - 1.0e-6;
+          T6 = AGIDL_i * Weff0 * T3 * lexp(-T2) * T5;
+        end
+        else begin
+          T6 = AGIDL_i * Weff0 * T3 * lexp(-T2) * vds_noswap;
+        end
+      end
+      if (sigvds > 0.0) begin
+        igidl = T6;
+      end
+      else begin
+        igisl = T6;
+      end
+      if ((AGISL_i <= 0.0) || (BGISL_t <= 0.0)) begin
+        T6 = 0.0;
+      end
+      else begin
+        T1 = (-vgs_noswap - EGISL_i + vfbsd) / T0;
+        T1 = hypsmooth(T1, 1.0e-2);
+        T2 = BGISL_t / (T1 + 1.0e-3);
+        T3 = lexp(PGISL_i * lln(T1));
+        if (BULKMOD != 0) begin
+          T4 = -ves_jct * ves_jct * ves_jct;
+          T4a = CGISL_i + abs(T4) + 1.0e-5;
+          T5 = hypsmooth(T4 / T4a, 1.0e-6) - 1.0e-6;
+          T6 = AGISL_i * Weff0 * T3 * lexp(-T2) * T5;
+        end
+        else
+          T6 = AGISL_i * Weff0 * T3 * lexp(-T2) * (-vds_noswap);
+      end
+      if (sigvds > 0.0) begin
+        igisl = T6;
+      end
+      else begin
+        igidl = T6;
+      end
+    end
+    if (BULKMOD != 0) begin
+      if (Isbs > 0.0) begin
+        if (ves_jct < VjsmRev) begin
+          T0 = ves_jct / Nvtms;
+          T1 = lexp(T0) - 1.0;
+          T2 = IVjsmRev + SslpRev * (ves_jct - VjsmRev);
+          Ies = T1 * T2;
+        end
+        else
+          if (ves_jct <= VjsmFwd) begin
+            T0 = ves_jct / Nvtms;
+            T1 = (BVS + ves_jct) / Nvtms;
+            T2 = lexp(-T1);
+            Ies = Isbs * (lexp(T0) + XExpBVS - 1.0 - XJBVS * T2);
+          end
+          else begin
+            Ies = IVjsmFwd + SslpFwd * (ves_jct - VjsmFwd);
+          end
+      end
+      else begin
+        Ies = 0.0;
+      end
+      if (JTSS_t > 0.0) begin
+        if ((VTSS - ves_jct) < (VTSS * 1.0e-3)) begin
+          T0 = -ves_jct / Vtm0 / NJTS_t;
+          T1 = lexp(T0 * 1.0e3) - 1.0;
+          Ies = Ies - ASEJ * JTSS_t * T1;
+        end
+        else begin
+          T0 = -ves_jct / Vtm0 / NJTS_t;
+          T1 = lexp(T0 * VTSS / (VTSS - ves_jct)) - 1.0;
+          Ies = Ies - ASEJ * JTSS_t * T1;
+        end
+      end
+      if (JTSSWS_t > 0.0) begin
+        if ((VTSSWS - ves_jct) < (VTSSWS * 1.0e-3)) begin
+          T0 = -ves_jct / Vtm0 / NJTSSW_t;
+          T1 = lexp(T0 * 1.0e3) - 1.0;
+          Ies = Ies - PSEJ * JTSSWS_t * T1;
+        end
+        else begin
+          T0 = -ves_jct / Vtm0 / NJTSSW_t;
+          T1 = lexp(T0 * VTSSWS / (VTSSWS - ves_jct)) - 1.0;
+          Ies = Ies - PSEJ * JTSSWS_t * T1;
+        end
+      end
+      if (JTSSWGS_t > 0.0) begin
+        if ((VTSSWGS - ves_jct) < (VTSSWGS * 1.0e-3)) begin
+          T0 = -ves_jct / Vtm0 / NJTSSWG_t;
+          T1 = lexp(T0 * 1.0e3) - 1.0;
+          Ies = Ies - Weff0 * NFINtotal * JTSSWGS_t * T1;
+        end
+        else begin
+          T0 = -ves_jct / Vtm0 / NJTSSWG_t;
+          T1 = lexp(T0 * VTSSWGS / (VTSSWGS - ves_jct)) - 1.0;
+          Ies = Ies - Weff0 * NFINtotal * JTSSWGS_t * T1;
+        end
+      end
+      if (Isbd > 0.0) begin
+        if (ved_jct < VjdmRev) begin
+          T0 = ved_jct / Nvtmd;
+          T1 = lexp(T0) - 1.0;
+          T2 = IVjdmRev + DslpRev * (ved_jct - VjdmRev);
+          Ied = T1 * T2;
+        end
+        else
+          if (ved_jct <= VjdmFwd) begin
+            T0 = ved_jct / Nvtmd;
+            T1 = (BVD + ved_jct) / Nvtmd;
+            T2 = lexp(-T1);
+            Ied = Isbd * (lexp(T0) + XExpBVD - 1.0 - XJBVD * T2);
+          end
+          else
+            Ied = IVjdmFwd + DslpFwd * (ved_jct - VjdmFwd);
+      end
+      else
+        Ied = 0.0;
+      if (JTSD_t > 0.0) begin
+        if ((VTSD - ved_jct) < (VTSD * 1.0e-3)) begin
+          T0 = -ved_jct / Vtm0 / NJTSD_t;
+          T1 = lexp(T0 * 1.0e3) - 1.0;
+          Ied = Ied - ADEJ * JTSD_t * T1;
+        end
+        else begin
+          T0 = -ved_jct / Vtm0 / NJTSD_t;
+          T1 = lexp(T0 * VTSD / (VTSD - ved_jct)) - 1.0;
+          Ied = Ied - ADEJ * JTSD_t * T1;
+        end
+      end
+      if (JTSSWD_t > 0.0) begin
+        if ((VTSSWD - ved_jct) < (VTSSWD * 1.0e-3)) begin
+          T0 = -ved_jct / Vtm0 / NJTSSWD_t;
+          T1 = lexp(T0 * 1.0e3) - 1.0;
+          Ied = Ied - PDEJ * JTSSWD_t * T1;
+        end
+        else begin
+          T0 = -ved_jct / Vtm0 / NJTSSWD_t;
+          T1 = lexp(T0 * VTSSWD / (VTSSWD - ved_jct)) - 1.0;
+          Ied = Ied - PDEJ * JTSSWD_t * T1;
+        end
+      end
+      if (JTSSWGD_t > 0.0) begin
+        if ((VTSSWGD - ved_jct) < (VTSSWGD * 1.0e-3)) begin
+          T0 = -ved_jct / Vtm0 / NJTSSWGD_t;
+          T1 = lexp(T0 * 1.0e3) - 1.0;
+          Ied = Ied - Weff0 * NFINtotal * JTSSWGD_t * T1;
+        end
+        else begin
+          T0 = -ved_jct / Vtm0 / NJTSSWGD_t;
+          T1 = lexp(T0 * VTSSWGD / (VTSSWGD - ved_jct)) - 1.0;
+          Ied = Ied - Weff0 * NFINtotal * JTSSWGD_t * T1;
+        end
+      end
+      begin
+        if (Czbs > 0.0) begin
+          T1 = ves_jct / PBS_t;
+          if (T1 < 0.9) begin
+            if (SJS > 0.0) begin
+              vec = PBS_t * (1.0 - lexp((1.0 / MJS) * lln(1.0 / SJS)));
+              pb2 = PBS_t * SJS * MJS2 / MJS / lexp(-(1.0 + MJS) * lln(1.0 - vec / PBS_t));
+              if (ves_jct > vec) begin
+                arg = 1.0 - T1;
+                if (MJS == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJS * lln(arg));
+                Qesj1 = PBS_t * Czbs * (1.0 - arg * sarg) / (1.0 - MJS);
+              end
+              else begin
+                arg = 1.0 - vec / PBS_t;
+                if (MJS == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJS * lln(arg));
+                Qec = PBS_t * Czbs * (1.0 - arg * sarg) / (1.0 - MJS);
+                arg = 1.0 - (ves_jct - vec) / pb2;
+                if (MJS2 == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJS2 * lln(arg));
+                Qesj1 = Qec + SJS * pb2 * Czbs * (1.0 - arg * sarg) / (1.0 - MJS2);
+              end
+            end
+            else begin
+              arg = 1.0 - T1;
+              if (MJS == 0.5)
+                sarg = 1.0 / sqrt(arg);
+              else
+                sarg = lexp(-MJS * lln(arg));
+              Qesj1 = PBS_t * Czbs * (1.0 - arg * sarg) / (1.0 - MJS);
+            end
+          end
+          else begin
+            T2 = lexp(-MJS * lln(0.1));
+            T3 = 1.0 / (1.0 - MJS);
+            T4 = T2 * (T1 - 1.0) * (5.0 * MJS * (T1 - 1.0) + (1.0 + MJS));
+            T5 = T3 * (1.0 - 0.05 * MJS * (1.0 + MJS) * T2);
+            Qesj1 = PBS_t * Czbs * (T4 + T5);
+          end
+        end
+        else begin
+          Qesj1 = 0.0;
+        end
+      end
+      begin
+        if (Czbssw > 0.0) begin
+          T1 = ves_jct / PBSWS_t;
+          if (T1 < 0.9) begin
+            if (SJSWS > 0.0) begin
+              vec = PBSWS_t * (1.0 - lexp((1.0 / MJSWS) * lln(1.0 / SJSWS)));
+              pb2 = PBSWS_t * SJSWS * MJSWS2 / MJSWS / lexp(-(1.0 + MJSWS) * lln(1.0 - vec / PBSWS_t));
+              if (ves_jct > vec) begin
+                arg = 1.0 - T1;
+                if (MJSWS == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWS * lln(arg));
+                Qesj2 = PBSWS_t * Czbssw * (1.0 - arg * sarg) / (1.0 - MJSWS);
+              end
+              else begin
+                arg = 1.0 - vec / PBSWS_t;
+                if (MJSWS == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWS * lln(arg));
+                Qec = PBSWS_t * Czbssw * (1.0 - arg * sarg) / (1.0 - MJSWS);
+                arg = 1.0 - (ves_jct - vec) / pb2;
+                if (MJSWS2 == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWS2 * lln(arg));
+                Qesj2 = Qec + SJSWS * pb2 * Czbssw * (1.0 - arg * sarg) / (1.0 - MJSWS2);
+              end
+            end
+            else begin
+              arg = 1.0 - T1;
+              if (MJSWS == 0.5)
+                sarg = 1.0 / sqrt(arg);
+              else
+                sarg = lexp(-MJSWS * lln(arg));
+              Qesj2 = PBSWS_t * Czbssw * (1.0 - arg * sarg) / (1.0 - MJSWS);
+            end
+          end
+          else begin
+            T2 = lexp(-MJSWS * lln(0.1));
+            T3 = 1.0 / (1.0 - MJSWS);
+            T4 = T2 * (T1 - 1.0) * (5.0 * MJSWS * (T1 - 1.0) + (1.0 + MJSWS));
+            T5 = T3 * (1.0 - 0.05 * MJSWS * (1.0 + MJSWS) * T2);
+            Qesj2 = PBSWS_t * Czbssw * (T4 + T5);
+          end
+        end
+        else begin
+          Qesj2 = 0.0;
+        end
+      end
+      begin
+        if (Czbsswg > 0.0) begin
+          T1 = ves_jct / PBSWGS_t;
+          if (T1 < 0.9) begin
+            if (SJSWGS > 0.0) begin
+              vec = PBSWGS_t * (1.0 - lexp((1.0 / MJSWGS) * lln(1.0 / SJSWGS)));
+              pb2 = PBSWGS_t * SJSWGS * MJSWGS2 / MJSWGS / lexp(-(1.0 + MJSWGS) * lln(1.0 - vec / PBSWGS_t));
+              if (ves_jct > vec) begin
+                arg = 1.0 - T1;
+                if (MJSWGS == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWGS * lln(arg));
+                Qesj3 = PBSWGS_t * Czbsswg * (1.0 - arg * sarg) / (1.0 - MJSWGS);
+              end
+              else begin
+                arg = 1.0 - vec / PBSWGS_t;
+                if (MJSWGS == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWGS * lln(arg));
+                Qec = PBSWGS_t * Czbsswg * (1.0 - arg * sarg) / (1.0 - MJSWGS);
+                arg = 1.0 - (ves_jct - vec) / pb2;
+                if (MJSWGS2 == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWGS2 * lln(arg));
+                Qesj3 = Qec + SJSWGS * pb2 * Czbsswg * (1.0 - arg * sarg) / (1.0 - MJSWGS2);
+              end
+            end
+            else begin
+              arg = 1.0 - T1;
+              if (MJSWGS == 0.5)
+                sarg = 1.0 / sqrt(arg);
+              else
+                sarg = lexp(-MJSWGS * lln(arg));
+              Qesj3 = PBSWGS_t * Czbsswg * (1.0 - arg * sarg) / (1.0 - MJSWGS);
+            end
+          end
+          else begin
+            T2 = lexp(-MJSWGS * lln(0.1));
+            T3 = 1.0 / (1.0 - MJSWGS);
+            T4 = T2 * (T1 - 1.0) * (5.0 * MJSWGS * (T1 - 1.0) + (1.0 + MJSWGS));
+            T5 = T3 * (1.0 - 0.05 * MJSWGS * (1.0 + MJSWGS) * T2);
+            Qesj3 = PBSWGS_t * Czbsswg * (T4 + T5);
+          end
+        end
+        else begin
+          Qesj3 = 0.0;
+        end
+      end
+      Qesj = Qesj1 + Qesj2 + Qesj3;
+      begin
+        if (Czbd > 0.0) begin
+          T1 = ved_jct / PBD_t;
+          if (T1 < 0.9) begin
+            if (SJD > 0.0) begin
+              vec = PBD_t * (1.0 - lexp((1.0 / MJD) * lln(1.0 / SJD)));
+              pb2 = PBD_t * SJD * MJD2 / MJD / lexp(-(1.0 + MJD) * lln(1.0 - vec / PBD_t));
+              if (ved_jct > vec) begin
+                arg = 1.0 - T1;
+                if (MJD == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJD * lln(arg));
+                Qedj1 = PBD_t * Czbd * (1.0 - arg * sarg) / (1.0 - MJD);
+              end
+              else begin
+                arg = 1.0 - vec / PBD_t;
+                if (MJD == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJD * lln(arg));
+                Qec = PBD_t * Czbd * (1.0 - arg * sarg) / (1.0 - MJD);
+                arg = 1.0 - (ved_jct - vec) / pb2;
+                if (MJD2 == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJD2 * lln(arg));
+                Qedj1 = Qec + SJD * pb2 * Czbd * (1.0 - arg * sarg) / (1.0 - MJD2);
+              end
+            end
+            else begin
+              arg = 1.0 - T1;
+              if (MJD == 0.5)
+                sarg = 1.0 / sqrt(arg);
+              else
+                sarg = lexp(-MJD * lln(arg));
+              Qedj1 = PBD_t * Czbd * (1.0 - arg * sarg) / (1.0 - MJD);
+            end
+          end
+          else begin
+            T2 = lexp(-MJD * lln(0.1));
+            T3 = 1.0 / (1.0 - MJD);
+            T4 = T2 * (T1 - 1.0) * (5.0 * MJD * (T1 - 1.0) + (1.0 + MJD));
+            T5 = T3 * (1.0 - 0.05 * MJD * (1.0 + MJD) * T2);
+            Qedj1 = PBD_t * Czbd * (T4 + T5);
+          end
+        end
+        else begin
+          Qedj1 = 0.0;
+        end
+      end
+      begin
+        if (Czbdsw > 0.0) begin
+          T1 = ved_jct / PBSWD_t;
+          if (T1 < 0.9) begin
+            if (SJSWD > 0.0) begin
+              vec = PBSWD_t * (1.0 - lexp((1.0 / MJSWD) * lln(1.0 / SJSWD)));
+              pb2 = PBSWD_t * SJSWD * MJSWD2 / MJSWD / lexp(-(1.0 + MJSWD) * lln(1.0 - vec / PBSWD_t));
+              if (ved_jct > vec) begin
+                arg = 1.0 - T1;
+                if (MJSWD == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWD * lln(arg));
+                Qedj2 = PBSWD_t * Czbdsw * (1.0 - arg * sarg) / (1.0 - MJSWD);
+              end
+              else begin
+                arg = 1.0 - vec / PBSWD_t;
+                if (MJSWD == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWD * lln(arg));
+                Qec = PBSWD_t * Czbdsw * (1.0 - arg * sarg) / (1.0 - MJSWD);
+                arg = 1.0 - (ved_jct - vec) / pb2;
+                if (MJSWD2 == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWD2 * lln(arg));
+                Qedj2 = Qec + SJSWD * pb2 * Czbdsw * (1.0 - arg * sarg) / (1.0 - MJSWD2);
+              end
+            end
+            else begin
+              arg = 1.0 - T1;
+              if (MJSWD == 0.5)
+                sarg = 1.0 / sqrt(arg);
+              else
+                sarg = lexp(-MJSWD * lln(arg));
+              Qedj2 = PBSWD_t * Czbdsw * (1.0 - arg * sarg) / (1.0 - MJSWD);
+            end
+          end
+          else begin
+            T2 = lexp(-MJSWD * lln(0.1));
+            T3 = 1.0 / (1.0 - MJSWD);
+            T4 = T2 * (T1 - 1.0) * (5.0 * MJSWD * (T1 - 1.0) + (1.0 + MJSWD));
+            T5 = T3 * (1.0 - 0.05 * MJSWD * (1.0 + MJSWD) * T2);
+            Qedj2 = PBSWD_t * Czbdsw * (T4 + T5);
+          end
+        end
+        else begin
+          Qedj2 = 0.0;
+        end
+      end
+      begin
+        if (Czbdswg > 0.0) begin
+          T1 = ved_jct / PBSWGD_t;
+          if (T1 < 0.9) begin
+            if (SJSWGD > 0.0) begin
+              vec = PBSWGD_t * (1.0 - lexp((1.0 / MJSWGD) * lln(1.0 / SJSWGD)));
+              pb2 = PBSWGD_t * SJSWGD * MJSWGD2 / MJSWGD / lexp(-(1.0 + MJSWGD) * lln(1.0 - vec / PBSWGD_t));
+              if (ved_jct > vec) begin
+                arg = 1.0 - T1;
+                if (MJSWGD == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWGD * lln(arg));
+                Qedj3 = PBSWGD_t * Czbdswg * (1.0 - arg * sarg) / (1.0 - MJSWGD);
+              end
+              else begin
+                arg = 1.0 - vec / PBSWGD_t;
+                if (MJSWGD == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWGD * lln(arg));
+                Qec = PBSWGD_t * Czbdswg * (1.0 - arg * sarg) / (1.0 - MJSWGD);
+                arg = 1.0 - (ved_jct - vec) / pb2;
+                if (MJSWGD2 == 0.5)
+                  sarg = 1.0 / sqrt(arg);
+                else
+                  sarg = lexp(-MJSWGD2 * lln(arg));
+                Qedj3 = Qec + SJSWGD * pb2 * Czbdswg * (1.0 - arg * sarg) / (1.0 - MJSWGD2);
+              end
+            end
+            else begin
+              arg = 1.0 - T1;
+              if (MJSWGD == 0.5)
+                sarg = 1.0 / sqrt(arg);
+              else
+                sarg = lexp(-MJSWGD * lln(arg));
+              Qedj3 = PBSWGD_t * Czbdswg * (1.0 - arg * sarg) / (1.0 - MJSWGD);
+            end
+          end
+          else begin
+            T2 = lexp(-MJSWGD * lln(0.1));
+            T3 = 1.0 / (1.0 - MJSWGD);
+            T4 = T2 * (T1 - 1.0) * (5.0 * MJSWGD * (T1 - 1.0) + (1.0 + MJSWGD));
+            T5 = T3 * (1.0 - 0.05 * MJSWGD * (1.0 + MJSWGD) * T2);
+            Qedj3 = PBSWGD_t * Czbdswg * (T4 + T5);
+          end
+        end
+        else begin
+          Qedj3 = 0.0;
+        end
+      end
+      Qedj = Qedj1 + Qedj2 + Qedj3;
+    end
+    Qes = Qesj + csbox * ves_jct;
+    Qed = Qedj + cdbox * ved_jct;
+    Qeg = cgbox * devsign * V(e, ge);
+    if (BULKMOD != 0) begin
+      T2 = devsign * V(ge, e);
+      T3 = T2 - deltaPhi + Eg / 2.0 + phib - DELVFBACC;
+      T0 = T3 + 0.02;
+      vge_overlap = 0.5 * (T0 + sqrt(T0 * T0 + 4.0 * 0.02));
+      Qeg = Qeg - NFINtotal * LeffCV * (CGBL_i * (T3 - vge_overlap + 0.5 * CKAPPAB_i * (sqrt(1.0 + 4.0 * vge_overlap / CKAPPAB_i) - 1.0)));
+    end
+    T0 = vds;
+    T1 = T0 * (AIGEN_i + BIGEN_i * T0 * T0);
+    idsgen = HFIN * TFIN * (Leff - 2.0 * LINTIGEN_i) * igentemp * T1;
+    T0 = ueff * coxeff * Weff0 / Leff;
+    igidl = NFINtotal * igidl;
+    igisl = NFINtotal * igisl;
+    igcd = NFINtotal * igcd;
+    igcs = NFINtotal * igcs;
+    igs = NFINtotal * igs;
+    igd = NFINtotal * igd;
+    igbinv = NFINtotal * igbinv;
+    igbacc = NFINtotal * igbacc;
+    idsgen = NFINtotal * idsgen;
+    igbs = 0.0;
+    igbd = 0.0;
+    if (BULKMOD == 0) begin
+      igbs = (igbinv + igbacc) * wf;
+      igbd = (igbinv + igbacc) * wr;
+    end
+    Esatnoi = 2.0 * VSAT_a / ueff;
+    if (NOIA > 0.0 || NOIB > 0.0 || NOIC > 0.0) begin
+      Leffnoi = Leff - 2.0 * LINTNOI_i;
+      Leffnoisq = Leffnoi * Leffnoi;
+      if (EM <= 0.0) begin
+        DelClm = 0.0;
+      end
+      else begin
+        T0 = (diffVds / litl + EM) / Esatnoi;
+        DelClm = litl * lln(T0);
+        if (DelClm < 0.0) begin
+          DelClm = 0.0;
+        end
+      end
+      T1 = 1.60219e-19 * 1.60219e-19 * 1.60219e-19 * Vtm * abs(ids) * ueff;
+      T2 = 1.0e10 * coxeff * Leffnoisq;
+      N0 = coxeff * qis / 1.60219e-19;
+      Nl = coxeff * qid / 1.60219e-19;
+      Nstar = Vtm / 1.60219e-19 * (coxeff + CIT_a);
+      T3 = NOIA * lln((N0 + Nstar) / (Nl + Nstar));
+      T4 = NOIB * (N0 - Nl);
+      T5 = 0.5 * NOIC * (N0 * N0 - Nl * Nl);
+      T6 = 1.60219e-19 * Vtm * ids * ids;
+      T7 = 1.0e10 * Leffnoisq * Weff0 * NFINtotal;
+      T8 = NOIA + NOIB * Nl + NOIC * Nl * Nl;
+      T9 = (Nl + Nstar) * (Nl + Nstar);
+      Ssi = T1 / T2 * (T3 + T4 + T5) + T6 / T7 * DelClm * T8 / T9;
+      T10 = NOIA * 1.60219e-19 * Vtm;
+      T11 = Weff0 * NFINtotal * Leffnoi * 1.0e10 * Nstar * Nstar;
+      Swi = T10 / T11 * ids * ids;
+      T1 = Swi + Ssi;
+      if (T1 > 0.0) begin
+        FNPowerAt1Hz = (Ssi * Swi) / T1;
+      end
+      else begin
+        FNPowerAt1Hz = 0.0;
+      end
+    end
+    else begin
+      FNPowerAt1Hz = 0.0;
+    end
+    case (TNOIMOD)       0: begin
+        T0 = ueff * qinv;
+        T1 = T0 * Rdsi + Leff * Leff;
+        Gtnoi = (T0 / T1) * NTNOI_i;
+        sid = 4.0 * Vtm * 1.60219e-19 * Gtnoi;
+      end
+
+      1: begin
+        Abulk = 1.0;
+        Vgst2Vtm = KSATIV_a * (qis + 2.0 * Vtm);
+        etaa = 1.0 - Vdseff * Abulk / Vgst2Vtm;
+        T0 = 1.0 - etaa;
+        T1 = 1.0 + etaa;
+        T2 = T1 + 2.0 * Abulk * Vtm / (qia + 1.0e-10);
+        T3 = T2 * T2;
+        T4 = T0 * T0;
+        T5 = T3 * T3;
+        T6 = 1.0 / (1.0 + Vdseff / EsatL);
+        gamma = T6 * (0.5 * T1 + T0 * T0 / (6.0 * T2));
+        delta = ((T1 / T3) - (5.0 * T1 + T2) * T4 / (15.0 * T5) + T4 * T4 / (9.0 * T5 * T2)) / (6.0 * T6 * T6 * T6);
+        T7 = T0 / T2;
+        epsilon = (T7 + T7 * T7 * T7 / 3.0) / (6.0 * T6);
+        T8 = qia / EsatL;
+        T8 = T8 * T8;
+        npart_c = RNOIC * (1.0 + T8 * TNOIC * Leff);
+        T9 = gamma * delta;
+        if (T9 > 0.0) begin
+          ctnoi = epsilon / sqrt(gamma * delta) * (2.5316 * npart_c);
+        end
+        else begin
+          ctnoi = 1.0;
+        end
+        if (ctnoi > 1) begin
+          ctnoi = 1.0;
+        end
+        if (ctnoi < 0) begin
+          ctnoi = 0.0;
+        end
+        npart_beta = RNOIA * (1.0 + T8 * TNOIA * Leff);
+        npart_theta = RNOIB * (1.0 + T8 * TNOIB * Leff);
+        gamma = gamma * (3.0 * npart_beta * npart_beta);
+        delta = delta * (3.75 * npart_theta * npart_theta);
+        T9 = qia * 0.5 * T1;
+        gche = beta * T9 * T6;
+        noiGd0 = NFINtotal * beta * qia / (1.0 + gche * Rdsi);
+        GammaGd0 = gamma * noiGd0;
+        sid = 4.0 * Vtm * 1.60219e-19 * GammaGd0;
+        C0 = NFINtotal * coxeff * WeffCV0 * LeffCV;
+        if (gamma > 0.0 && delta > 0.0) begin
+          sf = (noiGd0 + 1.0e-15) / sqrt(delta / gamma);
+        end
+        else begin
+          sf = 0.0;
+        end
+      end
+
+    endcase
+    if (RDSMOD != 2) begin
+      gspr = 1.0 / Rsource;
+      gdpr = 1.0 / Rdrain;
+    end
+    if (sigvds > 0.0) begin
+      I(di, si) <+ devsign * ids;
+    end
+    else begin
+      I(si, di) <+ devsign * ids;
+    end
+    I(di, si) <+ devsign * ddt(qd);
+    I(ge, si) <+ devsign * ddt(qg);
+    if (sigvds > 0.0) begin
+      I(di, si) <+ devsign * idsgen;
+      I(ge, si) <+ devsign * (igcs + igs);
+      I(ge, di) <+ devsign * (igcd + igd);
+      if (BULKMOD != 0) begin
+        I(di, e) <+ devsign * (igidl + Iii);
+        I(si, e) <+ devsign * igisl;
+        I(ge, e) <+ devsign * (igbinv + igbacc);
+      end
+      else begin
+        I(di, si) <+ devsign * (igidl + Iii);
+        I(si, di) <+ devsign * igisl;
+      end
+    end
+    else begin
+      I(si, di) <+ devsign * idsgen;
+      I(ge, di) <+ devsign * (igcs + igs);
+      I(ge, si) <+ devsign * (igcd + igd);
+      if (BULKMOD != 0) begin
+        I(si, e) <+ devsign * (igidl + Iii);
+        I(di, e) <+ devsign * igisl;
+        I(ge, e) <+ devsign * (igbinv + igbacc);
+      end
+      else begin
+        I(si, di) <+ devsign * (igidl + Iii);
+        I(di, si) <+ devsign * igisl;
+      end
+    end
+    if (BULKMOD == 0) begin
+      I(ge, si) <+ devsign * igbs;
+      I(ge, di) <+ devsign * igbd;
+    end
+    if (BULKMOD != 0) begin
+      I(e, si) <+ devsign * Ies;
+      I(e, di) <+ devsign * Ied;
+    end
+    I(e, si) <+ devsign * ddt(Qes);
+    I(e, di) <+ devsign * ddt(Qed);
+    I(e, ge) <+ devsign * ddt(Qeg);
+    I(ge, si) <+ ddt(qgs_parasitic);
+    I(ge, di) <+ ddt(qgd_parasitic);
+    I(d, s) <+ ddt(qds_fr);
+    if (CGEOMOD == 1) begin
+      I(ge, s) <+ ddt(qgs_fr);
+      I(ge, d) <+ ddt(qgd_fr);
+    end
+    if (BULKMOD != 0) begin
+      I(ge, si) <+ devsign * ddt(qg_acc);
+      I(e, si) <+ devsign * ddt(qb_acc);
+    end
+    if (RDSMOD == 2) begin
+      V(d, di) <+ 0.0;
+      V(s, si) <+ 0.0;
+    end
+    else begin
+      I(d, di) <+ V(d, di) / Rdrain;
+      I(s, si) <+ V(s, si) / Rsource;
+    end
+    if (RGATEMOD != 0)
+      I(g, ge) <+ V(g, ge) * ggeltd;
+    else
+      V(g, ge) <+ 0.0;
+    I(di, si) <+ flicker_noise(FNPowerAt1Hz, EF, "flicker");
+    if (RDSMOD != 2) begin
+      I(d, di) <+ white_noise(4.0 * Vtm * 1.60219e-19 * gdpr, "thermal");
+      I(s, si) <+ white_noise(4.0 * Vtm * 1.60219e-19 * gspr, "thermal");
+    end
+    if (RGATEMOD != 0)
+      I(g, ge) <+ white_noise(4.0 * Vtm * 1.60219e-19 * ggeltd, "thermal");
+    if (TNOIMOD == 0) begin
+      I(di, si) <+ white_noise(sid, "thermal");
+      V(N) <+ 0.0;
+    end
+    else begin
+      I(di, si) <+ white_noise(sid * abs(1.0 - ctnoi * ctnoi), "thermal");
+      I(di, si) <+ ctnoi * V(N) * sf * SCALEN;
+      if (gamma > 0 && delta > 0) begin
+        I(N) <+ V(N) * sf * SCALEN;
+        I(N) <+ white_noise(sid / (sf * sf * SCALEN * SCALEN));
+      end
+      else begin
+        I(N) <+ V(N);
+      end
+      I(ge, si) <+ ddt(0.5 * C0 * SCALEN * V(N));
+      I(ge, di) <+ ddt(0.5 * C0 * SCALEN * V(N));
+    end
+    if (IGCMOD != 0) begin
+      if (sigvds > 0) begin
+        I(ge, si) <+ white_noise(2.0 * 1.60219e-19 * abs(igcs + igs), "shot");
+        I(ge, di) <+ white_noise(2.0 * 1.60219e-19 * abs(igcd + igd), "shot");
+      end
+      else begin
+        I(ge, di) <+ white_noise(2.0 * 1.60219e-19 * abs(igcs + igs), "shot");
+        I(ge, si) <+ white_noise(2.0 * 1.60219e-19 * abs(igcd + igd), "shot");
+      end
+    end
+    if (IGBMOD != 0) begin
+      if (BULKMOD != 0) begin
+        I(ge, e) <+ white_noise(2.0 * 1.60219e-19 * abs(igbinv + igbacc), "shot");
+      end
+      else begin
+        I(ge, si) <+ white_noise(2.0 * 1.60219e-19 * abs(igbs), "shot");
+        I(ge, di) <+ white_noise(2.0 * 1.60219e-19 * abs(igbd), "shot");
+      end
+    end
+    if (SHMOD != 0 && RTH0 > 0) begin
+      if (RDSMOD != 2) begin
+        Pwr(t) <+ -(devsign * sigvds * V(di, si) * ids + V(d, di) * V(d, di) / Rdrain + V(s, si) * V(s, si) / Rsource);
+      end
+      else begin
+        Pwr(t) <+ -(devsign * sigvds * V(di, si) * ids);
+      end
+    end
+    Pwr(t) <+ Temp(t) * gth;
+    Pwr(t) <+ ddt(Temp(t) * cth);
+    WEFF = Weff0;
+    LEFF = Leff;
+    WEFFCV = WeffCV0;
+    LEFFCV = LeffCV;
+    IDS = devsign * ids;
+    if (sigvds > 0) begin
+      if (BULKMOD != 0) begin
+        IDEFF = IDS + devsign * idsgen - devsign * (igd + igcd) + devsign * (Iii + igidl) - devsign * Ied;
+        ISEFF = -IDS - devsign * idsgen - devsign * (igs + igcs) + devsign * igisl - devsign * Ies;
+      end
+      else begin
+        IDEFF = IDS + devsign * idsgen - devsign * (igd + igcd + igbd) + devsign * (Iii + igidl - igisl);
+        ISEFF = -IDS - devsign * idsgen - devsign * (igs + igcs + igbs) + devsign * (igisl - igidl);
+      end
+    end
+    else begin
+      if (BULKMOD != 0) begin
+        IDEFF = -IDS - devsign * idsgen - devsign * (igs + igcs) + devsign * igisl - devsign * Ied;
+        ISEFF = IDS + devsign * idsgen - devsign * (igd + igcd) + devsign * (Iii + igidl) - devsign * Ies;
+      end
+      else begin
+        IDEFF = -IDS - devsign * idsgen - devsign * (igs + igcs + igbd) + devsign * (igisl - igidl);
+        ISEFF = IDS + devsign * idsgen - devsign * (igd + igcd + igbs) + devsign * (Iii + igidl - igisl);
+      end
+    end
+    if (BULKMOD == 0) begin
+      IGTOT = devsign * (igs + igd + igcs + igcd + igbs + igbd);
+    end
+    else begin
+      IGTOT = devsign * (igs + igd + igcs + igcd + igbacc + igbinv);
+    end
+    IDSGEN = sigvds * devsign * idsgen;
+    III = devsign * Iii;
+    if (sigvds > 0) begin
+      IGIDL = devsign * igidl;
+      IGISL = devsign * igisl;
+    end
+    else begin
+      IGIDL = devsign * igisl;
+      IGISL = devsign * igidl;
+    end
+    if (BULKMOD != 0) begin
+      IJSB = -devsign * Ies;
+      IJDB = -devsign * Ied;
+    end
+    else begin
+      IJSB = 0.0;
+      IJDB = 0.0;
+    end
+    if (BULKMOD != 0) begin
+      ISUB = -III - IGIDL - IGISL - IJSB - IJDB - devsign * (igbinv + igbacc);
+    end
+    else begin
+      ISUB = 0.0;
+    end
+    BETA = beta;
+    VDSSAT = Vdsat;
+    if (NGATE_i > 0)
+      VFB = -devsign * (phib + Vtm * lln(NGATE_i / ni));
+    else
+      VFB = PHIG_i - (EASUB + 0.5 * Eg + devsign * phib);
+    q0 = 10.0 * Vtm / rc + 2.0 * qbs;
+    T1 = Vtm * (Vtm + q0);
+    T2 = cox * cox * T1;
+    T3 = 2.0 * 1.60219e-19 * ni * epssub * Vtm;
+    VTH = VFB + devsign * (Vtm * lln(T2 / T3) + dvch_qm + phib + qbs + Vtm + dvth_all - DELVTRAND);
+    GM = ddx(IDS, V(ge));
+    GDS = ddx(IDS, V(di));
+    if (BULKMOD != 0)
+      GMBS = ddx(IDS, V(e));
+    else
+      GMBS = 0.0;
+    QGI = devsign * qg + devsign * qg_acc;
+    QDI = devsign * qd;
+    QSI = devsign * qs;
+    QBI = devsign * (qb + qb_acc);
+    QG = devsign * qg + qgs_parasitic + qgd_parasitic + ((CGEOMOD == 1) ? (qgs_fr + qgd_fr) : (0)) + devsign * qg_acc - devsign * Qeg;
+    QD = devsign * qd - qgd_parasitic - ((CGEOMOD == 1) ? (qgd_fr) : (0)) - devsign * Qed;
+    QS = devsign * qs - qgs_parasitic - ((CGEOMOD == 1) ? (qgs_fr) : (0)) - devsign * Qes;
+    QB = devsign * (qb + qb_acc) + devsign * (Qeg + Qes + Qed);
+    CGGI = ddx(QGI, V(ge));
+    CGSI = -ddx(QGI, V(si));
+    CGDI = -ddx(QGI, V(di));
+    CGEI = -ddx(QGI, V(e));
+    CSGI = -ddx(QSI, V(ge));
+    CSDI = -ddx(QSI, V(di));
+    CSSI = ddx(QSI, V(si));
+    CSEI = -ddx(QSI, V(e));
+    CDGI = -ddx(QDI, V(ge));
+    CDDI = ddx(QDI, V(di));
+    CDSI = -ddx(QDI, V(si));
+    CDEI = -ddx(QDI, V(e));
+    CEGI = -ddx(QBI, V(ge));
+    CEDI = -ddx(QBI, V(di));
+    CESI = -ddx(QBI, V(si));
+    CEEI = ddx(QBI, V(e));
+    CGG = ddx(QG, V(ge));
+    CGS = -ddx(QG, V(si));
+    CGD = -ddx(QG, V(di));
+    CGE = -ddx(QG, V(e));
+    CSG = -ddx(QS, V(ge));
+    CSD = -ddx(QS, V(di));
+    CSS = ddx(QS, V(si));
+    CSE = -ddx(QS, V(e));
+    CDG = -ddx(QD, V(ge));
+    CDD = ddx(QD, V(di));
+    CDS = -ddx(QD, V(si));
+    CDE = -ddx(QD, V(e));
+    CEG = -ddx(QB, V(ge));
+    CED = -ddx(QB, V(di));
+    CES = -ddx(QB, V(si));
+    CEE = ddx(QB, V(e));
+    CGSEXT = -ddx(qgs_parasitic + ((CGEOMOD == 1) ? (qgs_fr) : (0)), V(si));
+    CGDEXT = -ddx(qgd_parasitic + ((CGEOMOD == 1) ? (qgd_fr) : (0)), V(di));
+    CGBOV = -devsign * ddx(Qeg, V(e));
+    CJST = -devsign * ddx(Qes, V(si));
+    CJDT = -devsign * ddx(Qed, V(di));
+    RSGEO = RSourceGeo;
+    RDGEO = RDrainGeo;
+    CFGEO = Cfr_geo;
+    T_TOTAL_K = DevTemp;
+    T_TOTAL_C = DevTemp - 273.15;
+    T_DELTA_SH = Temp(t);
+  end
+///////////////////// main definition end ///////////////////////////
+
+endmodule
